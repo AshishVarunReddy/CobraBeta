@@ -1,2 +1,4 @@
-comp
+comp.o
+lexerf.o
+cobra
 test.cra
