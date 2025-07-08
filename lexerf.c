@@ -19,7 +19,7 @@ void print_token(Token* token){
     }else if(token->Type == EOFILE){
         printf("The type is EOFILE\n");
     }else{
-        printf("Unknown type\n");
+        printf("Unknowns type\n");
     }
     printf("\n");
 }
@@ -58,6 +58,9 @@ Token* gen_key(int* current_index, char* current){
     if(!strcmp(keyword_char, "exit")){
         key->Type = KEYWORD;
         key->value = keyword;
+    }else{
+        key->Type = STRING;
+        key->value = keyword;
     }
     return key;
 }
@@ -75,7 +78,7 @@ Token** lexer(FILE* fp){
     fread(buffer, 1, len, fp);
     char* current = (char*)malloc(sizeof(char)*len + 1);
     *(buffer+ sizeof(char)*len - 1) = '\0';
-    printf("Buffer: %s", buffer);
+    printf("Buffer: %s\n", buffer);
     for(int i = 0; i<sizeof(char)*len+1; i++){
         if(buffer[i] == 10){
             printf("NewLine character detected at %d in the total buffer len of %zu\n", i, sizeof(char)*len + 1);
@@ -89,10 +92,12 @@ Token** lexer(FILE* fp){
             tokenArray = (Token**)realloc(tokenArray, (token_index+1)*sizeof(Token*));
         }
         if(isdigit(current[current_index])){
+           printf("is digit: %c\n", current[current_index]); 
            Token* test_tok = gen_num(&current_index, current);
            tokenArray[token_index++] = test_tok;
            current_index--;
         }else if(isalpha(current[current_index])){
+            printf("is alpha: %c\n", current[current_index]);
             Token* key = gen_key(&current_index, current);
             tokenArray[token_index++] = key;
             current_index--;

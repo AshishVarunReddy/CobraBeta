@@ -1,7 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
-#include<fcntl.h>
 #include"lexerf.h"
 
 extern int token_index;
@@ -21,5 +20,6 @@ int main(){
   }
   fclose(fp);
   free(tokenArray);
+  printf("token_index is %d\n", token_index);
   return 0;
 }
