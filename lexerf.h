@@ -25,6 +25,8 @@ Token* gen_num(int* current_index, char* current);
 
 Token* gen_key(int* current_index, char*current);
 
+Token* gen_seperator(int* current_index, char*current);
+
 Token** lexer(FILE* fp);
 
 extern int token_index;

@@ -9,8 +9,11 @@ comp.o : comp.c lexerf.h
 lexerf.o : lexerf.c lexerf.h
 	$(cc)  -c lexerf.c
 
-cobra : comp.o lexerf.o
-	$(cc) $(cflags) comp.o lexerf.o -o cobra
+parserf.o : parserf.c parserf.h
+	$(cc)  -c parserf.c
+
+cobra : comp.o lexerf.o parserf.o
+	$(cc) $(cflags) comp.o lexerf.o parserf.o -o cobra
 
 
 clean : comp.o lexerf.o

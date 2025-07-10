@@ -2,13 +2,19 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include"lexerf.h"
+#include"parserf.h"
 
 extern int token_index;
 
 
-int main(){
+int main(int argc, char** argv){
 
-  FILE* fp = fopen("test.cra", "r");
+  FILE* fp = fopen(argv[1], "r");
+  if(argc < 2){
+      perror("Invalid compiler use\n");
+      exit(1);
+  }
+
   if(!fp){
       perror("File not opened!!\n");
       exit(-1);
@@ -18,8 +24,11 @@ int main(){
   for(int i = 0; i<token_index; i++){
       print_token(tokenArray[i]);
   }
+ parser(tokenArray);
+
   fclose(fp);
   free(tokenArray);
-  printf("token_index is %d\n", token_index);
+
+
   return 0;
 }

@@ -10,17 +10,24 @@
 void print_token(Token* token){
     printf("\nPrinting token...\n");
     printf("value: %s\n", (token->value));
-    if(token->Type == INT){
-        printf("The type is INT\n");
-    }else if(token->Type == KEYWORD){
-        printf("The type is KEYWORD\n");
-    }else if(token->Type == SEPARATOR){
-        printf("The type is SEPARATOR\n");
-    }else if(token->Type == EOFILE){
-        printf("The type is EOFILE\n");
-    }else{
-        printf("Unknowns type\n");
+
+    switch(token->Type){
+        case INT:
+            printf("Type: INT\n");
+            break;
+        case KEYWORD:
+            printf("Type: KEYWORD\n");
+            break;
+        case SEPARATOR:
+            printf("Type: SEPARATOR\n");
+            break;
+        case EOFILE:
+            printf("Type: EOFILE\n");
+            break;
+        default:
+            printf("Undefined type\n");
     }
+    
     printf("\n");
 }
 
@@ -65,6 +72,17 @@ Token* gen_key(int* current_index, char* current){
     return key;
 }
 
+Token* gen_seperator(int* current_index, char* current){
+    Token* token = (Token*)malloc(sizeof(Token));
+    char* s = (char*)malloc(2*sizeof(char));
+    snprintf(s, 2, "%c", current[*current_index]);
+
+    token->Type = SEPARATOR;
+    token->value = s;
+
+    return token;
+}
+
 int token_index = 0;
 
 
@@ -76,7 +94,6 @@ Token** lexer(FILE* fp){
     buffer = (char*)malloc(sizeof(char)* len+1);
     buffer[len] = '\0';
     fread(buffer, 1, len, fp);
-    char* current = (char*)malloc(sizeof(char)*len + 1);
     *(buffer+ sizeof(char)*len - 1) = '\0';
     printf("Buffer: %s\n", buffer);
     for(int i = 0; i<sizeof(char)*len+1; i++){
@@ -84,7 +101,7 @@ Token** lexer(FILE* fp){
             printf("NewLine character detected at %d in the total buffer len of %zu\n", i, sizeof(char)*len + 1);
         }
     }
-    current = buffer;
+    char* current = buffer;
     int current_index = 0;
     Token** tokenArray = (Token**)malloc(sizeof(Token*)*2);
     while(current[current_index]!='\0'){
@@ -92,30 +109,37 @@ Token** lexer(FILE* fp){
             tokenArray = (Token**)realloc(tokenArray, (token_index+1)*sizeof(Token*));
         }
         if(isdigit(current[current_index])){
-           printf("is digit: %c\n", current[current_index]); 
            Token* test_tok = gen_num(&current_index, current);
            tokenArray[token_index++] = test_tok;
            current_index--;
         }else if(isalpha(current[current_index])){
-            printf("is alpha: %c\n", current[current_index]);
             Token* key = gen_key(&current_index, current);
             tokenArray[token_index++] = key;
             current_index--;
         }else if(current[current_index] == ';'){
             Token* semi = (Token*)malloc(sizeof(Token));
-            semi->value = ";";
-            semi->Type = SEPARATOR;
+
+            semi = gen_seperator(&current_index, current);
             tokenArray[token_index++] = semi;
         }else if(current[current_index] == '('){
             Token* openP = (Token*)malloc(sizeof(Token));
-            openP->value = "(";
-            openP->Type = SEPARATOR;
+            openP = gen_seperator(&current_index, current);
+
+
             tokenArray[token_index++] = openP;
         }else if(current[current_index] == ')'){
             Token* closeP = (Token*)malloc(sizeof(Token));
-            closeP->value = ")";
-            closeP->Type = SEPARATOR;
+            closeP = gen_seperator(&current_index, current);
+
             tokenArray[token_index++] = closeP;
+        }else if(current[current_index] == ' '){
+            current_index++;
+            continue;
+        }else if(current[current_index] == '\n'){
+            printf("found newline character\n");
+        }else{
+            perror("Unknown Character\n");
+            exit(-1);
         }
 
         current_index++;
@@ -128,6 +152,7 @@ Token** lexer(FILE* fp){
     fintok->value = NULL;
     fintok->Type = EOFILE;
     tokenArray[token_index++] = fintok;
+    free(buffer);
     return tokenArray;
 }
 
