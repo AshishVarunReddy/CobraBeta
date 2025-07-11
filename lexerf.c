@@ -105,9 +105,9 @@ Token** lexer(FILE* fp){
     }
     char* current = buffer;
     int current_index = 0;
-    Token** tokenArray = (Token**)malloc(sizeof(Token*)*2);
+    Token** tokenArray = (Token**)malloc(sizeof(Token*)*12);
     while(current[current_index]!='\0'){
-        if(token_index+1 > 2){
+        if(token_index+1 > 12){
             tokenArray = (Token**)realloc(tokenArray, (token_index+1)*sizeof(Token*));
         }
         if(isdigit(current[current_index])){
@@ -147,11 +147,11 @@ Token** lexer(FILE* fp){
         current_index++;
     }
     
-    if(token_index+1 > 8){
+    if(token_index+1 > 12){
         tokenArray = (Token**)realloc(tokenArray, (token_index+1)*sizeof(Token*));
     }
     Token* fintok = (Token*)malloc(sizeof(Token));
-    fintok->value = NULL;
+    fintok->value = "Eofile";
     fintok->Type = EOFILE;
     tokenArray[token_index++] = fintok;
     free(buffer);

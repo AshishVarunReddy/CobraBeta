@@ -12,8 +12,11 @@ lexerf.o : lexerf.c lexerf.h
 parserf.o : parserf.c parserf.h
 	$(cc)  -c parserf.c
 
-cobra : comp.o lexerf.o parserf.o
-	$(cc) $(cflags) comp.o lexerf.o parserf.o -o cobra
+codegeneratorf.o : codegeneratorf.c codegeneratorf.h
+	$(cc) -c codegeneratorf.c
+
+cobra : comp.o lexerf.o parserf.o codegeneratorf.o
+	$(cc) $(cflags) comp.o lexerf.o parserf.o codegeneratorf.o -o cobra
 
 
 clean : comp.o lexerf.o

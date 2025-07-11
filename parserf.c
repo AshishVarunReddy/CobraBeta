@@ -3,16 +3,16 @@
 #include <string.h>
 #include<ctype.h>
 #include"lexerf.h"
+#include"codegeneratorf.h"
 
 
 
-
-typedef struct Node{
-    char* value;
-    Tokentype type;
-    struct Node* left;
-    struct Node* right;
-}Node;
+//typedef struct Node{
+   // char* value;
+   // Tokentype type;
+   // struct Node* left;
+  //  struct Node* right;
+//}Node;
 
 Node* create_node(char* value, Tokentype type){
     Node* newNode = (Node*)malloc(sizeof(Node));
@@ -22,6 +22,11 @@ Node* create_node(char* value, Tokentype type){
     newNode->right = NULL;
 
     return newNode;
+}
+
+void print_error(char* errorType){
+    fprintf(stderr, "Error: %s\n", errorType);
+    exit(-1);
 }
 
 void print_tree(Node* root, char* prestatement, int spaces){
@@ -38,7 +43,7 @@ void print_tree(Node* root, char* prestatement, int spaces){
 }
 
 
-void parser(Token** tokenArray){
+Token** parser(Token** tokenArray){
     Token* current_token = tokenArray[0];
     int i = 0;
 
@@ -47,23 +52,28 @@ void parser(Token** tokenArray){
     Node* current_node = root;
     while(current_token->Type != EOFILE){
         if(current_node == NULL){
-            return;
+            exit(-1);
         }
         if(current_node == root){
-            printf("root\n");
+            //printf("root\n");
         }
 
+        current_token = tokenArray[i];
         switch(current_token->Type){
             case KEYWORD:
                 if(!strcmp(current_token->value, "exit")){
+                    printf("Exit\n");
                     Node* exitNode = create_node(current_token->value, KEYWORD);
                     root->right = exitNode;
                     current_node = current_node->right;
+                    printf("black hole %d\n", i);
                     current_token = tokenArray[++i];
-                }
+                    printf("black hole %d\n", i);
+                
 
                 if(!strcmp(current_token->value, "(") && current_token->Type == SEPARATOR){
                     Node* oParen = create_node(current_token->value, SEPARATOR);
+                    printf("magnetar: %p\n", oParen);
                     current_node->left = oParen;
                     current_token = tokenArray[++i];
                     if(current_token->Type == INT){
@@ -74,39 +84,42 @@ void parser(Token** tokenArray){
                                 Node* cParen = create_node(current_token->value, SEPARATOR);
                                 current_node->left->right = cParen;
                                 current_token = tokenArray[++i];
-                                if(!strcmp(current_token->value, ";") && current_token->Type == SEPARATOR){
+                                if(current_token->value != NULL && !strcmp(current_token->value, ";") && current_token->Type == SEPARATOR){
                                     Node* semi = create_node(current_token->value, SEPARATOR);
                                     current_node->right = semi;
-                                    current_token = tokenArray[++i];
+                                    print_tree(root, "root", 0);
+                                    generate_code(root);
+                                    //free(exitNode);
+                                    //free(oParen);
+                                    //free(cParen);
+                                    //free(semi);
+                                    current_node = root;
                                     break;
                                 }else{
-                                    perror("Missing SemiColon\n");
-                                    exit(-1);
+                                    print_error("Semi Colon Not found");
                                 }
                              }else{
-                                 perror("Invalid Syntax\n");
-                                 exit(-1);
+                                 print_error("No Closed Paren");
                              }
                     }else{
-                        perror("Invalid Syntax\n");
-                        exit(-1);
+                        print_error("Not an Integer");
                     }
                 }else{
-                    perror("Error found\n");
-                    exit(-1);
+                    print_error("No Open Paren");
                 }
+        }
                 break;
             case SEPARATOR:
                 //
                 break;
             case INT:
-                //
-                break;
+                printf("INTEGER\n");
         }
-        print_tree(root, "root", 0);
-        current_token = tokenArray[i++];
+        i++;
+
     }
     free(root);
+    return tokenArray;
 }
 
 

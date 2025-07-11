@@ -3,3 +3,7 @@ lexerf.o
 cobra
 test.cra
 parserf.o
+codegenerator.o
+assembly/test.asm
+assembly/test.o
+assembly/test

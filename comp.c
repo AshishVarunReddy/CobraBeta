@@ -3,6 +3,7 @@
 #include<unistd.h>
 #include"lexerf.h"
 #include"parserf.h"
+#include"codegeneratorf.h"
 
 extern int token_index;
 
