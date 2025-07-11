@@ -5,6 +5,7 @@
 #define LEXER_H
 
 typedef enum{
+    BEGINNING,
     STRING,
     INT,
     KEYWORD,

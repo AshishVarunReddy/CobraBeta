@@ -8,8 +8,8 @@
 
 
 void print_token(Token* token){
-    printf("\nPrinting token...\n");
-    printf("value: %s\n", (token->value));
+    printf("\nPrinting token: ");
+    printf("value: '%s'  ,", (token->value));
 
     switch(token->Type){
         case INT:
@@ -24,11 +24,13 @@ void print_token(Token* token){
         case EOFILE:
             printf("Type: EOFILE\n");
             break;
+        case BEGINNING:
+            printf("Type: BEGINNING\n");
+            break;
         default:
             printf("Undefined type\n");
     }
     
-    printf("\n");
 }
 
 Token* gen_num(int* current_index, char* current){
