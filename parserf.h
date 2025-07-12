@@ -11,7 +11,7 @@ typedef struct Node{
 }Node;
 
 
-Token** parser(Token** tokenArray);
+Node* parser(Token** tokenArray);
 void print_tree(Node* root, char* prestatement, int spaces);
 void print_error(char* errorType);
 

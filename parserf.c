@@ -43,7 +43,7 @@ void print_tree(Node* root, char* prestatement, int spaces){
 }
 
 
-Token** parser(Token** tokenArray){
+Node* parser(Token** tokenArray){
     Token* current_token = tokenArray[0];
     int i = 0;
 
@@ -62,18 +62,14 @@ Token** parser(Token** tokenArray){
         switch(current_token->Type){
             case KEYWORD:
                 if(!strcmp(current_token->value, "exit")){
-                    printf("Exit\n");
                     Node* exitNode = create_node(current_token->value, KEYWORD);
                     root->right = exitNode;
                     current_node = current_node->right;
-                    printf("black hole %d\n", i);
                     current_token = tokenArray[++i];
-                    printf("black hole %d\n", i);
                 
 
                 if(!strcmp(current_token->value, "(") && current_token->Type == SEPARATOR){
                     Node* oParen = create_node(current_token->value, SEPARATOR);
-                    printf("magnetar: %p\n", oParen);
                     current_node->left = oParen;
                     current_token = tokenArray[++i];
                     if(current_token->Type == INT){
@@ -87,12 +83,6 @@ Token** parser(Token** tokenArray){
                                 if(current_token->value != NULL && !strcmp(current_token->value, ";") && current_token->Type == SEPARATOR){
                                     Node* semi = create_node(current_token->value, SEPARATOR);
                                     current_node->right = semi;
-                                    print_tree(root, "root", 0);
-                                    generate_code(root);
-                                    //free(exitNode);
-                                    //free(oParen);
-                                    //free(cParen);
-                                    //free(semi);
                                     current_node = root;
                                     break;
                                 }else{
@@ -118,8 +108,7 @@ Token** parser(Token** tokenArray){
         i++;
 
     }
-    free(root);
-    return tokenArray;
+    return root;
 }
 
 

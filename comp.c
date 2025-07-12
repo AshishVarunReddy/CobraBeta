@@ -25,11 +25,13 @@ int main(int argc, char** argv){
   for(int i = 0; i<token_index; i++){
       print_token(tokenArray[i]);
   }
- parser(tokenArray);
+  
+ Node* parseNode = parser(tokenArray);
+ generate_code(parseNode);
 
   fclose(fp);
   free(tokenArray);
-
+  free(parseNode);
 
   return 0;
 }
