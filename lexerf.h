@@ -10,6 +10,7 @@ typedef enum{
     INT,
     KEYWORD,
     SEPARATOR,
+    OPERATOR,
     EOFILE,
 }Tokentype;
 
@@ -26,7 +27,7 @@ Token* gen_num(int* current_index, char* current);
 
 Token* gen_key(int* current_index, char*current);
 
-Token* gen_seperator(int* current_index, char*current);
+Token* gen_seperator_or_operator(int* current_index, char*current, Tokentype type);
 
 Token** lexer(FILE* fp);
 

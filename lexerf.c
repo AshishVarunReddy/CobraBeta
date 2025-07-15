@@ -21,6 +21,9 @@ void print_token(Token* token){
         case SEPARATOR:
             printf("Type: SEPARATOR\n");
             break;
+        case OPERATOR:
+            printf("Type: OPERATOR\n");
+            break;
         case EOFILE:
             printf("Type: EOFILE\n");
             break;
@@ -74,12 +77,12 @@ Token* gen_key(int* current_index, char* current){
     return key;
 }
 
-Token* gen_seperator(int* current_index, char* current){
+Token* gen_seperator_or_operator(int* current_index, char* current, Tokentype type){
     Token* token = (Token*)malloc(sizeof(Token));
     char* s = (char*)malloc(2*sizeof(char));
     snprintf(s, 2, "%c", current[*current_index]);
 
-    token->Type = SEPARATOR;
+    token->Type = type;
     token->value = s;
 
     return token;
@@ -121,26 +124,34 @@ Token** lexer(FILE* fp){
         }else if(current[current_index] == ';'){
             Token* semi = (Token*)malloc(sizeof(Token));
 
-            semi = gen_seperator(&current_index, current);
+            semi = gen_seperator_or_operator(&current_index, current, SEPARATOR);
             tokenArray[token_index++] = semi;
         }else if(current[current_index] == '('){
-            Token* openP = (Token*)malloc(sizeof(Token));
-            openP = gen_seperator(&current_index, current);
-
-
+            Token* openP = gen_seperator_or_operator(&current_index, current, SEPARATOR);
             tokenArray[token_index++] = openP;
+        }else if(current[current_index] == '+'){
+            Token* plus = gen_seperator_or_operator(&current_index, current, OPERATOR);
+            tokenArray[token_index++] = plus;
         }else if(current[current_index] == ')'){
-            Token* closeP = (Token*)malloc(sizeof(Token));
-            closeP = gen_seperator(&current_index, current);
-
+            Token* closeP = gen_seperator_or_operator(&current_index, current, SEPARATOR);
             tokenArray[token_index++] = closeP;
         }else if(current[current_index] == ' '){
             current_index++;
             continue;
         }else if(current[current_index] == '\n'){
             printf("found newline character\n");
+        }else if(current[current_index] == '-'){
+            Token* minus = gen_seperator_or_operator(&current_index, current, OPERATOR);
+            tokenArray[token_index++] = minus;
+        }else if(current[current_index] == '/'){
+            Token* divide = gen_seperator_or_operator(&current_index, current, OPERATOR);
+            tokenArray[token_index++] = divide;
+        }else if(current[current_index] == '*'){
+            Token* multiply = gen_seperator_or_operator(&current_index, current, OPERATOR);
+            tokenArray[token_index++] = multiply;
         }else{
-            perror("Unknown Character\n");
+            perror("Unknown Character");
+            printf("%c\n", current[current_index]);
             exit(-1);
         }
 
