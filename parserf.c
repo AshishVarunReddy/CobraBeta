@@ -45,7 +45,7 @@ void print_tree(Node* root, char* prestatement, int spaces){
 
 int op_prec(char s){
     if(s == '^')return 3;
-    if(s == '*' || s == '/')return 2;
+    if(s == '*' || s == '/' || s == '%')return 2;
     if(s == '+' || s == '-')return 1;
 
     return -1;

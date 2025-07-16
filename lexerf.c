@@ -149,6 +149,9 @@ Token** lexer(FILE* fp){
         }else if(current[current_index] == '*'){
             Token* multiply = gen_seperator_or_operator(&current_index, current, OPERATOR);
             tokenArray[token_index++] = multiply;
+        }else if(current[current_index] == '%'){
+            Token* mod = gen_seperator_or_operator(&current_index, current, OPERATOR);
+            tokenArray[token_index++] = mod;
         }else{
             perror("Unknown Character");
             printf("%c\n", current[current_index]);

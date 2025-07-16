@@ -27,7 +27,7 @@ int main(int argc, char** argv){
   }
   
  Node* parseNode = parser(tokenArray);
- //generate_code(parseNode);
+ generate_code(parseNode);
 
   fclose(fp);
   free(tokenArray);
