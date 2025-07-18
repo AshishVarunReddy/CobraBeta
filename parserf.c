@@ -65,7 +65,7 @@ char** exp_convertor(char** expr, int iter, int* mov){
     stack* st = create_stack_element("STACK_END");
     for(int i = iter-1; i>=0; i--){
        
-       if(isalnum(*expr[i])){
+       if(isalnum(*expr[i]) || atoi(expr[i]) < 0){
             prefix[z] = expr[i];
             z--;
        }else if(*expr[i] == ')'){
@@ -78,7 +78,7 @@ char** exp_convertor(char** expr, int iter, int* mov){
            }
            popStack(&st);
        }else{
-           while(empty_stack(st) == 0 && op_prec(*expr[i]) <= op_prec(*peep(st))){
+           while(empty_stack(st) == 0 && op_prec(*expr[i]) < op_prec(*peep(st))){//CHECK FOR EQUALITY!!
                prefix[z] = peep(st);
                z--;
                popStack(&st);
@@ -105,7 +105,8 @@ static int x = 0;
 
 Node* generate_operation_tree(char** expression_array, int lt){
        if(lt <= x)return NULL;
-       Node* node = create_node(expression_array[x], (isalnum(*expression_array[x])) ? INT : OPERATOR);
+       char* sl = expression_array[x];
+       Node* node = create_node(expression_array[x], (isalnum(*sl) || atoi(sl)<0) ? INT : OPERATOR);
        x++;
        
        if(node->type == INT){
@@ -149,7 +150,7 @@ Node* parser(Token** tokenArray){
                     Node* oParen = create_node(current_token->value, SEPARATOR);
                     current_node->left = oParen;
                     current_token = tokenArray[++i];
-                    if(!strcmp(current_token->value, "(") || current_token->Type == INT){
+                    if(!strcmp(current_token->value, "(") || current_token->Type == INT || *current_token->value == '-'){
                             int j = i;
                             char** expr = (char**)malloc((token_index+1)*sizeof(char*));
                             expr[token_index] = NULL;
@@ -164,10 +165,62 @@ Node* parser(Token** tokenArray){
                                         }
                                         popStack(&s);
                                     }
-                                if(empty_stack(s) == 0)
-                                    expr[iter++] = tokenArray[j]->value;
-                                j++;
+                                if(empty_stack(s) == 0){
+                                    if(iter == 0 && (*tokenArray[j]->value == '-')){
+                                        expr[iter++] = "0";
+                                    }else if((tokenArray[j-1]->Type == OPERATOR) && *tokenArray[j]->value == '-'){
+                                        if(tokenArray[j+1]->Type == INT){
+                                            int ln = strlen(tokenArray[j+1]->value);
+                                            char* bf = (char*)malloc(sizeof(char*)*(ln+2));
+                                            bf[ln+1] = '\0';
+                                            sprintf(bf, "-%s", tokenArray[j+1]->value);
+                                            tokenArray[j]->value = bf;
+                                            tokenArray[j]->Type = INT;
+                                            j+=2;
+                                            expr[iter] = bf;
+                                            iter++;
+                                            continue;
+                                        }else if(*tokenArray[j+1]->value == '('){
+                                            stack* substack = create_stack_element("STACK_END");
+                                            push(&substack, "BUFFER");
+                                            int k = j;
+                                            k++;
+                                            push(&s, tokenArray[k]->value);
+                                            expr[iter++] = tokenArray[k++]->value;
+                                            push(&s, "0");
+                                            expr[iter++] = "0";
+                                            push(&s, "-");
+                                            expr[iter++] = "-";
+                                            j+=2;
+                                            k = j;
+                                            while(empty_stack(substack) == 0){
+                                              char* substr = tokenArray[k]->value;
+                                              if(*substr == '('){
+                                                    push(&substack, "(");
+                                              }else if(*substr == ')'){
+                                                  while(*peep(substack) != '(' && strcmp(peep(substack), "BUFFER")){
+                                                        popStack(&substack);
+                                                    }
+                                                  popStack(&substack);
+                                              }else if((*substr == '+' || *substr == '-') && !strcmp(peep(substack), "BUFFER")){
+                                                  if(*substr == '+'){
+                                                        *substr = '-';
+                                                    }else{
+                                                        if(*tokenArray[k-1]->value == '/' || *tokenArray[k-1]->value == '*')
+                                                            *substr = '-';
+                                                        else
+                                                            *substr = '+';
+                                                    }
+                                                }
+                                                k++;
+                                            }
+                                        }
+                                    }
+                            if(*tokenArray[j]->value != ' ')
+                                expr[iter++] = tokenArray[j]->value;
+                            j++;
                             }
+                        }
                             printf("bls: \n");
                             for(int p = 0; p<iter; p++){
                                 printf("%s ",expr[p]);
@@ -187,8 +240,9 @@ Node* parser(Token** tokenArray){
                             Node* synode = generate_operation_tree(expression_array, iter-mov);
                             print_tree(synode, "center", 0);
                             current_node->left->left = synode;
-                            current_token = tokenArray[j-1];
-                            i = j-1; 
+                            current_token = tokenArray[j];
+                            i = j;
+                            printf("black Hole: %s\n", current_token->value);
                              if(!strcmp(current_token->value, ")") && current_token->Type == SEPARATOR){
                                 Node* cParen = create_node(current_token->value, SEPARATOR);
                                 current_node->left->right = cParen;

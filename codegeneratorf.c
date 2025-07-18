@@ -29,15 +29,15 @@ int operations_asm(int a, int b, char op, FILE* fp){
         return a-b;
     }
     else if(op == '*'){
-        fprintf(fp, "mov rax, %d\nmov r9, %d\nimul r9\n", a, b);
+        fprintf(fp, "mov rax, %d\nimul rax, %d\n", a, b);
         return a*b;
     }
     else if(op == '/'){
-        fprintf(fp, "mov rax, %d\nmov r12, %d\ndiv r12\n", a, b);
+        fprintf(fp, "mov rax, %d\nmov r10, %d\nidiv r10\n", a, b);
         return a/b;
     }
     else if(op == '%'){
-        fprintf(fp, "mov rax, %d\nmov r12, %d\ndiv r12\nmov rax, rdx\n",a , b);
+        fprintf(fp, "mov rax, %d\nmov r10, %d\nidiv r10\nmov rax, rdx\n",a , b);
         return a%b;
     }
     
@@ -99,7 +99,17 @@ int calculate_node(Node** op_node, FILE* fp){
     if((*op_node)->left->type == INT && (*op_node)->right->type == INT){
         int a = atoi((*op_node)->left->value);
         int b = atoi((*op_node)->right->value);
-        sprintf((*op_node)->value ,"%d",operations_asm(a, b, *((*op_node)->value), fp));
+        int digit = operations_asm(a, b, *((*op_node)->value), fp);
+
+        if(digit < 0){
+            char* newbf = (char*)malloc(sizeof(char) * strlen((*op_node)->value)+2);
+            newbf[sizeof(char)*strlen((*op_node)->value) + 1] = '\0';
+            sprintf(newbf, "%d", digit);
+            (*op_node)->value = newbf;
+        }
+        else
+            sprintf((*op_node)->value ,"%d",digit);
+
         (*op_node)->type = INT;
     }
    return atoi((*op_node)->value);
@@ -128,15 +138,16 @@ void traverse(Node* root, FILE* fp, calls* c){
     }
     int t = (root->type);
     if((t == INT || t == OPERATOR) && flag == 0){
+        printf("HI\n");
         int num = calculate_node(&root, fp);
         printf("black hole: %d\n", num);
-        fprintf(fp, "mov r12, rax\n");
+        fprintf(fp, "push rax\n");
         flag = 1;
     }
 
     if(!strcmp(root->value, ";")){
         printf("; appeared\n");
-        fprintf(fp, "%s:\nmov rax, %d\nmov rdi, r12\n", c->call, c->number);
+        fprintf(fp, "%s:\nmov rax, %d\npop rdi\n", c->call, c->number);
         fprintf(fp, "syscall\n");
     }
     

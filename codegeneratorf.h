@@ -12,6 +12,16 @@ typedef struct calls{
 }calls;
 
 
+int operations_int(int a, int b, char op);
+
+int operations_asm(int a, int b, char op, FILE* fp);
+
+int sysgen(char* call);
+
+int calculate_node(Node** op_node, FILE* fp);
+
+void traverse(Node* root, FILE* fp, calls* c);
+
 int generate_code(Node* root);
 
 #endif
