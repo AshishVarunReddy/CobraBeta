@@ -115,7 +115,6 @@ int calculate_node(Node** op_node, FILE* fp){
    return atoi((*op_node)->value);
 }
 
-static int flag = 0;
 
 void traverse(Node* root, FILE* fp, calls* c){
     if(!root){
@@ -137,22 +136,29 @@ void traverse(Node* root, FILE* fp, calls* c){
         printf(") appeared\n");
     }
     int t = (root->type);
-    if((t == INT || t == OPERATOR) && flag == 0){
-        printf("HI\n");
+    if((t == INT || t == OPERATOR) && *root->value != '='){
         int num = calculate_node(&root, fp);
+        printf("Magnetar:%s\n", root->value);
+
         printf("black hole: %d\n", num);
+        free(root->right);
+        free(root->left);
+        root->right = NULL;
+        root->left = NULL;
         fprintf(fp, "push rax\n");
-        flag = 1;
     }
 
-    if(!strcmp(root->value, ";")){
+    if(c->call && !strcmp(root->value, ";")){
         printf("; appeared\n");
+        if(!strcmp(c->call, "exit")){
         fprintf(fp, "%s:\nmov rax, %d\npop rdi\n", c->call, c->number);
         fprintf(fp, "syscall\n");
+        }
     }
-    
-    traverse(root->left, fp, c);
-    traverse(root->right, fp, c);
+    if(root->left)
+        traverse(root->left, fp, c);
+    if(root->right)
+        traverse(root->right, fp, c);
 }
 
 int generate_code(Node* root){

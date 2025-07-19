@@ -10,6 +10,7 @@ typedef enum{
     INT,
     KEYWORD,
     SEPARATOR,
+    IDENTIFIER,
     OPERATOR,
     EOFILE,
 }Tokentype;
@@ -25,7 +26,7 @@ void print_token(Token* token);
 
 Token* gen_num(int* current_index, char* current);
 
-Token* gen_key(int* current_index, char*current);
+Token* gen_key_or_ident(int* current_index, char*current);
 
 Token* gen_seperator_or_operator(int* current_index, char*current, Tokentype type);
 

@@ -21,6 +21,9 @@ void print_token(Token* token){
         case SEPARATOR:
             printf("Type: SEPARATOR\n");
             break;
+        case IDENTIFIER:
+            printf("Type : IDENTIFIER\n");
+            break;
         case OPERATOR:
             printf("Type: OPERATOR\n");
             break;
@@ -52,7 +55,7 @@ Token* gen_num(int* current_index, char* current){
     return literal;
 }
 
-Token* gen_key(int* current_index, char* current){
+Token* gen_key_or_ident(int* current_index, char* current){
     Token* key = (Token*)malloc(sizeof(Token));
     char* keyword = (char*)malloc(sizeof(char)*32);
     int keyword_index = 0;
@@ -70,8 +73,11 @@ Token* gen_key(int* current_index, char* current){
     if(!strcmp(keyword_char, "exit")){
         key->Type = KEYWORD;
         key->value = keyword;
+    }else if(!strcmp(keyword_char, "int")){
+        key->Type = KEYWORD;
+        key->value = keyword;
     }else{
-        key->Type = STRING;
+        key->Type = IDENTIFIER;
         key->value = keyword;
     }
     return key;
@@ -118,7 +124,7 @@ Token** lexer(FILE* fp){
            tokenArray[token_index++] = test_tok;
            current_index--;
         }else if(isalpha(current[current_index])){
-            Token* key = gen_key(&current_index, current);
+            Token* key = gen_key_or_ident(&current_index, current);
             tokenArray[token_index++] = key;
             current_index--;
         }else if(current[current_index] == ';'){
@@ -152,6 +158,9 @@ Token** lexer(FILE* fp){
         }else if(current[current_index] == '%'){
             Token* mod = gen_seperator_or_operator(&current_index, current, OPERATOR);
             tokenArray[token_index++] = mod;
+        }else if(current[current_index] == '='){
+            Token* eq = gen_seperator_or_operator(&current_index, current, OPERATOR);
+            tokenArray[token_index++] = eq;
         }else{
             perror("Unknown Character");
             printf("%c\n", current[current_index]);

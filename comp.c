@@ -23,7 +23,7 @@ int main(int argc, char** argv){
   Token** tokenArray = (Token**)malloc(sizeof(Token*) * token_index);
   tokenArray = lexer(fp);
   for(int i = 0; i<token_index; i++){
-      //print_token(tokenArray[i]);
+      print_token(tokenArray[i]);
   }
   
  Node* parseNode = parser(tokenArray);
