@@ -174,7 +174,9 @@ int generate_code(Node* root){
     c->number = -1;
     c->next = NULL;
     int syscode;
+    if(root->right){
     syscode = sysgen(root->right->value);
+    }
     fprintf(f, "global _start\n");
     fprintf(f, "section .text\n_start:\n");
     traverse(root, f, c);

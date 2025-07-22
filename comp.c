@@ -25,8 +25,9 @@ int main(int argc, char** argv){
   for(int i = 0; i<token_index; i++){
       print_token(tokenArray[i]);
   }
-  
+ 
  Node* parseNode = parser(tokenArray);
+
  generate_code(parseNode);
 
   fclose(fp);
