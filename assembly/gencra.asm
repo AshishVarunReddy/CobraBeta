@@ -1,21 +1,24 @@
 global _start
 section .text
 _start:
-mov rax, 0
-sub rax, 4
+push rbp
+mov rbp, rsp
+mov rax, 5
+add rax, 3
+mov r10, rax
+sub rsp, 4
+mov dword [rbp-4], 8
 mov rax, 4
-add rax, 6
-mov rax, 10
-imul rax, 5
-mov rax, -4
-add rax, 50
-push rax
+add rax, 9
+mov r10, rax
+sub rsp, 4
+mov dword [rbp-8], 13
 mov rax, 0
 sub rax, 3
 mov rax, -3
 add rax, 5
-push rax
+mov r10, rax
 exit:
 mov rax, 60
-pop rdi
+mov rdi, r10
 syscall

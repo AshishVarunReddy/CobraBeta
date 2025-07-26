@@ -278,14 +278,14 @@ int handle_exit_syscall(Token** tokenArray, Node* current_node, int i){
 
  return i;
 }
-int create_variable(Token** tokenArray, Node*current_node, int i){
-    Node* initial = current_node;
+int create_variable(Token** tokenArray, Node**current_node, int i){
+    Node* initial = *current_node;
     Node* stopNode;
     Token* current_token = tokenArray[i];
     Node* var_node = create_node(current_token->value, KEYWORD);
-    current_node->left = var_node;
-    current_node = var_node;
-    stopNode = current_node;
+    (*current_node)->left = var_node;
+    *current_node = var_node;
+    stopNode = *current_node;
     i++;
 
     if(tokenArray[i]->Type == EOFILE || tokenArray[i]->Type != IDENTIFIER){
@@ -294,25 +294,26 @@ int create_variable(Token** tokenArray, Node*current_node, int i){
     }
     if(tokenArray[i]->Type == IDENTIFIER){
         Node* ident_node = create_node(tokenArray[i]->value, tokenArray[i]->Type);
-        current_node->left = ident_node;
-        current_node = ident_node;
+        (*current_node)->left = ident_node;
+        *current_node = ident_node;
         i++;
     }
     if(tokenArray[i]->Type == OPERATOR){
         if(!strcmp(tokenArray[i]->value, "=")){
            Node* eqNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
-           current_node->left = eqNode;
-           current_node = eqNode;
+           (*current_node)->left = eqNode;
+           *current_node = eqNode;
            i++;
         }else{
             perror("Expected '=' but got something else\n");
             exit(1);
         }
     }else{
+        printf("That is %s\n", tokenArray[i]->value);
         perror("Syntax Error, No operator\n");
         exit(1);
     }
-    expression_string_generator(tokenArray, current_node, &i, 0); 
+    expression_string_generator(tokenArray, *current_node, &i, 0); 
     /*if(tokenArray[i]->Type == INT){
         Node* varInt_node = create_node(tokenArray[i]->value, tokenArray[i]->Type);
         current_node->left = varInt_node;
@@ -326,10 +327,17 @@ int create_variable(Token** tokenArray, Node*current_node, int i){
     if(tokenArray[i]->Type == SEPARATOR){
         if(*tokenArray[i]->value == ';'){
             Node* semi_node = create_node(tokenArray[i]->value, tokenArray[i]->Type);
-            current_node = stopNode;
-            current_node->right = semi_node;
+            *current_node = stopNode;
+            (*current_node)->right = semi_node;
+
+            if(tokenArray[i+2] && tokenArray[i+2]->Type == IDENTIFIER){
+                *current_node = semi_node;
+                printf("SOLID LIQ\n");
+            }else{
+                printf("GASS\n");
+                *current_node = initial;
+            }
         }
-        current_node = initial;
     }
     return i;
 }
@@ -353,7 +361,7 @@ Node* parser(Token** tokenArray){
                     i =  handle_exit_syscall(tokenArray,  current_node, i);
                     i--;
                 }else if(!strcmp(current_token->value, "int")){
-                    i = create_variable(tokenArray, current_node, i);
+                    i = create_variable(tokenArray, &current_node, i);
                 }
                 print_tree(root, "root", 0);
                 break;

@@ -33,5 +33,6 @@ Token* gen_seperator_or_operator(int* current_index, char*current, Tokentype typ
 Token** lexer(FILE* fp);
 
 extern int token_index;
+extern int var_num;
 
 #endif

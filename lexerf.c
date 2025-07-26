@@ -55,6 +55,7 @@ Token* gen_num(int* current_index, char* current){
     return literal;
 }
 
+int var_num = 0;
 Token* gen_key_or_ident(int* current_index, char* current){
     Token* key = (Token*)malloc(sizeof(Token));
     char* keyword = (char*)malloc(sizeof(char)*32);
@@ -76,6 +77,7 @@ Token* gen_key_or_ident(int* current_index, char* current){
     }else if(!strcmp(keyword_char, "int")){
         key->Type = KEYWORD;
         key->value = keyword;
+        var_num++;
     }else{
         key->Type = IDENTIFIER;
         key->value = keyword;
@@ -96,7 +98,6 @@ Token* gen_seperator_or_operator(int* current_index, char* current, Tokentype ty
 
 int token_index = 0;
 
-
 Token** lexer(FILE* fp){
     char* buffer = 0;
     fseek(fp, 0, SEEK_END);
@@ -107,11 +108,6 @@ Token** lexer(FILE* fp){
     fread(buffer, 1, len, fp);
     *(buffer+ sizeof(char)*len - 1) = '\0';
     printf("Buffer: %s\n", buffer);
-    for(int i = 0; i<sizeof(char)*len+1; i++){
-        if(buffer[i] == 10){
-            printf("NewLine character detected at %d in the total buffer len of %zu\n", i, sizeof(char)*len + 1);
-        }
-    }
     char* current = buffer;
     int current_index = 0;
     Token** tokenArray = (Token**)malloc(sizeof(Token*)*12);
@@ -145,7 +141,7 @@ Token** lexer(FILE* fp){
             current_index++;
             continue;
         }else if(current[current_index] == '\n'){
-            printf("found newline character\n");
+
         }else if(current[current_index] == '-'){
             Token* minus = gen_seperator_or_operator(&current_index, current, OPERATOR);
             tokenArray[token_index++] = minus;

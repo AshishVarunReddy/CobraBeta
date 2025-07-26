@@ -7,8 +7,8 @@
 
 typedef struct calls{
     int number;
-    char* call;
-    struct calls* next;
+    char* func_call;
+    char* var_name;
 }calls;
 
 

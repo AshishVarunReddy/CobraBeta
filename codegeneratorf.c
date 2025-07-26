@@ -10,6 +10,9 @@
 #include<unistd.h>
 #include<wait.h>
 
+
+extern int var_num;
+
 int operations_int(int a, int b, char op){
     if(op == '+')return a+b;
     if(op == '-')return a-b;
@@ -78,6 +81,8 @@ int sysgen(char* call){
 }
 
 
+static int num_vars = 1;
+
 int calculate_node(Node** op_node, FILE* fp){
     
     if(!(*op_node)){
@@ -124,8 +129,10 @@ void traverse(Node* root, FILE* fp, calls* c){
         printf("exits\n");
         //fprintf(fp, "exit:\n");
         //fprintf(fp, "mov rax, %d\n", sysgen("exit"));
-        c->call = "exit";
-        c->number = 60;
+        printf("SOLAR\n");
+        c->func_call = "exit";
+        c->var_name = NULL;
+        c->number = sysgen("exit");
     }
 
     if(!strcmp(root->value, "(")){
@@ -145,14 +152,27 @@ void traverse(Node* root, FILE* fp, calls* c){
         free(root->left);
         root->right = NULL;
         root->left = NULL;
-        fprintf(fp, "push rax\n");
+        if(c->var_name){
+            c->number = atoi(root->value);
+        }
+
+        fprintf(fp, "mov r10, rax\n");
     }
 
-    if(c->call && !strcmp(root->value, ";")){
+    if(!strcmp(root->value, "int")){
+        printf("variable appeared\n");
+        c->var_name = root->left->value;
+        c->func_call = NULL;
+    }
+
+    if((c->func_call || c->var_name) && !strcmp(root->value, ";")){
         printf("; appeared\n");
-        if(!strcmp(c->call, "exit")){
-        fprintf(fp, "%s:\nmov rax, %d\npop rdi\n", c->call, c->number);
+        if(c->func_call && !strcmp(c->func_call, "exit")){
+        fprintf(fp, "%s:\nmov rax, %d\nmov rdi, r10\n", c->func_call, c->number);
         fprintf(fp, "syscall\n");
+        }else if(c->var_name){
+            fprintf(fp,"sub rsp, 4\nmov dword [rbp-%d], %d\n", 4*num_vars, c->number);
+            num_vars++;
         }
     }
     if(root->left)
@@ -170,15 +190,18 @@ int generate_code(Node* root){
     
     
     calls* c = (calls*)malloc(sizeof(calls));
-    c->call = NULL;
-    c->number = -1;
-    c->next = NULL;
+    c->func_call = NULL;
+    c->var_name = NULL;
+    c->number = INT_MIN;
     int syscode;
     if(root->right){
     syscode = sysgen(root->right->value);
     }
     fprintf(f, "global _start\n");
     fprintf(f, "section .text\n_start:\n");
+    if(var_num > 0){
+        fprintf(f, "push rbp\nmov rbp, rsp\n");
+    }
     traverse(root, f, c);
     fclose(f);
     
@@ -210,7 +233,6 @@ int generate_code(Node* root){
         waitpid(id3, NULL, 0);
     }
     //system("rm ./assembly/gencra.asm");
-    free(c);
     return 0;
 }
 
