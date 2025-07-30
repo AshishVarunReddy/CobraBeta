@@ -5,15 +5,10 @@
 #include"lexerf.h"
 #include"codegeneratorf.h"
 #include"stackf.h"
+#include"hashtable.h"
 
 extern int token_index;
 
-/*typedef struct Node{
-    char* value;
-    Tokentype type;
-    struct Node* left;
-    struct Node* right;
-}Node;*/
 
 Node* create_node(char* value, Tokentype type){
     Node* newNode = (Node*)malloc(sizeof(Node));
@@ -345,7 +340,7 @@ int create_variable(Token** tokenArray, Node**current_node, int i){
 Node* parser(Token** tokenArray){
     Token* current_token = tokenArray[0];
     int i = 0;
-
+    item** variable_hash = create_hash(3);
     Node* root = create_node("PROGRAM",BEGINNING); 
 
     Node* current_node = root;

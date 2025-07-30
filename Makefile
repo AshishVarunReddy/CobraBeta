@@ -18,8 +18,11 @@ codegeneratorf.o : codegeneratorf.c codegeneratorf.h
 stackf.o : stackf.c stackf.h
 	$(cc) -c stackf.c
 
-cobra : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o
-	$(cc) $(cflags) comp.o lexerf.o parserf.o codegeneratorf.o stackf.o -o cobra
+hashtable.o : hashtable.c hashtable.h
+	$(cc) -c hashtable.c
+
+cobra : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o
+	$(cc) $(cflags) comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o -o cobra
 
 
 clean : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o
