@@ -1,4 +1,5 @@
 #include"lexerf.h"
+#include"hashtable.h"
 #ifndef PARSER_H
 
 #define PARSER_H
@@ -13,7 +14,7 @@ typedef struct Node{
 
 Node* create_node(char* value, Tokentype type);
 
-Node* parser(Token** tokenArray);
+Node* parser(Token** tokenArray, item*** variable_s);
 
 int op_prec(char s);
 
@@ -24,6 +25,8 @@ Node* generate_operation_tree(char** expression_array, int lt);
 void print_tree(Node* root, char* prestatement, int spaces);
 
 void print_error(char* errorType);
+
+item** symbol_returner(item** itemizer);
 
 
 #endif

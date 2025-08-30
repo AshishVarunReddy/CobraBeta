@@ -8,7 +8,7 @@
 #include"hashtable.h"
 
 extern int token_index;
-
+extern int var_num;
 
 Node* create_node(char* value, Tokentype type){
     Node* newNode = (Node*)malloc(sizeof(Node));
@@ -213,7 +213,6 @@ char** expression_string_generator(Token** tokenArray, Node* current_node, int* 
             //printf("black hole:%s\n", exp_convertor(expr, iter));
             int mov = 0;
             char** expression_array = exp_convertor(expr, iter, &mov);
-            printf("bull \n");
             //memmove(expression_array, expression_array+mov, ;
             for(int y = 0; y<iter-mov; y++){
                 expression_array[y] = expression_array[y+mov];
@@ -237,7 +236,7 @@ char** expression_string_generator(Token** tokenArray, Node* current_node, int* 
 
 }
 
-int handle_exit_syscall(Token** tokenArray, Node* current_node, int i){
+int handle_exit_syscall(Token** tokenArray, Node* current_node, int i, item** variable_table){
         Token* current_token = tokenArray[i];
         Node* exitNode = create_node(current_token->value, KEYWORD);
         current_node->right = exitNode;
@@ -249,8 +248,26 @@ int handle_exit_syscall(Token** tokenArray, Node* current_node, int i){
         current_node->left = oParen;
         current_node = oParen;
         current_token = tokenArray[++i];
-        expression_string_generator(tokenArray, current_node, &i, 1);
-        current_token = tokenArray[i];
+        if(tokenArray[i]->Type == INT && *tokenArray[i+1]->value == ')'){
+            Node* numNode = create_node(current_token->value, current_token->Type);
+            current_node->left = numNode;
+            current_node = exitNode->left;
+            current_token = tokenArray[++i];
+        }
+        else if(tokenArray[i]->Type == INT){
+            expression_string_generator(tokenArray, current_node, &i, 1);
+            current_token = tokenArray[i];
+            
+        }else if(tokenArray[i]->Type == IDENTIFIER){
+            if(search_var(variable_table, var_num, current_token->value)){
+                Node* var_node = create_node(current_token->value, current_token->Type);
+                current_node ->left = var_node;
+                current_token = tokenArray[++i];
+                printf("variable found\n");
+            }else{
+                perror("Variable not found\n");
+                exit(1);
+            }
         }
         if(*current_token->value == ')'){
             Node* cParen = create_node(current_token->value, SEPARATOR);
@@ -271,9 +288,11 @@ int handle_exit_syscall(Token** tokenArray, Node* current_node, int i){
             exit(1);
         }
 
- return i;
+ 
+    }
+    return i;
 }
-int create_variable(Token** tokenArray, Node**current_node, int i){
+int create_variable(Token** tokenArray, Node**current_node, int i, item** variable_item){
     Node* initial = *current_node;
     Node* stopNode;
     Token* current_token = tokenArray[i];
@@ -289,6 +308,7 @@ int create_variable(Token** tokenArray, Node**current_node, int i){
     }
     if(tokenArray[i]->Type == IDENTIFIER){
         Node* ident_node = create_node(tokenArray[i]->value, tokenArray[i]->Type);
+        (*variable_item)->key = tokenArray[i]->value;
         (*current_node)->left = ident_node;
         *current_node = ident_node;
         i++;
@@ -308,7 +328,13 @@ int create_variable(Token** tokenArray, Node**current_node, int i){
         perror("Syntax Error, No operator\n");
         exit(1);
     }
-    expression_string_generator(tokenArray, *current_node, &i, 0); 
+    if(tokenArray[i]->Type == INT && *tokenArray[i+1]->value == ';' ){
+        Node* numNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
+        (*current_node)->left = numNode;
+        *current_node = stopNode;
+        i++;
+    }else
+        expression_string_generator(tokenArray, *current_node, &i, 0); 
     /*if(tokenArray[i]->Type == INT){
         Node* varInt_node = create_node(tokenArray[i]->value, tokenArray[i]->Type);
         current_node->left = varInt_node;
@@ -318,7 +344,6 @@ int create_variable(Token** tokenArray, Node**current_node, int i){
         perror("Expected int, got something else\n");
         exit(1);
     }*/
-
     if(tokenArray[i]->Type == SEPARATOR){
         if(*tokenArray[i]->value == ';'){
             Node* semi_node = create_node(tokenArray[i]->value, tokenArray[i]->Type);
@@ -327,9 +352,7 @@ int create_variable(Token** tokenArray, Node**current_node, int i){
 
             if(tokenArray[i+2] && tokenArray[i+2]->Type == IDENTIFIER){
                 *current_node = semi_node;
-                printf("SOLID LIQ\n");
             }else{
-                printf("GASS\n");
                 *current_node = initial;
             }
         }
@@ -337,26 +360,33 @@ int create_variable(Token** tokenArray, Node**current_node, int i){
     return i;
 }
 
-Node* parser(Token** tokenArray){
+item** symbol_returner(item** itemizer){
+    return itemizer;
+}
+
+Node* parser(Token** tokenArray, item*** variable_s){
     Token* current_token = tokenArray[0];
     int i = 0;
-    item** variable_hash = create_hash(3);
     Node* root = create_node("PROGRAM",BEGINNING); 
 
     Node* current_node = root;
+    item** variable_table = create_hash(var_num);
+    item* current_item = variable_table[0];
+    int var_it = 0;
     while(current_token->value && current_token->Type != EOFILE){
         if(current_node == NULL){
             exit(-1);
         }
-        
+     
         current_token = tokenArray[i];
         switch(current_token->Type){
             case KEYWORD:
                 if(!strcmp(current_token->value, "exit")){
-                    i =  handle_exit_syscall(tokenArray,  current_node, i);
+                    i =  handle_exit_syscall(tokenArray,  current_node, i, variable_table);
                     i--;
                 }else if(!strcmp(current_token->value, "int")){
-                    i = create_variable(tokenArray, &current_node, i);
+                    i = create_variable(tokenArray, &current_node, i, &current_item);
+                    current_item = variable_table[++var_it];
                 }
                 print_tree(root, "root", 0);
                 break;
@@ -382,6 +412,12 @@ Node* parser(Token** tokenArray){
         perror("Not possible\n");
         exit(1);
     }
+
+    for(int i = 0; i<var_num; i++){
+        printf("Nihilus: %s\n", variable_table[i]->key);
+    }
+    printf("soda\n");
+    *variable_s = variable_table;
     return root;
 }
 

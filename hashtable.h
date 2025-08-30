@@ -13,13 +13,15 @@
 typedef struct item{
     char* key;
     char* value;
+    int depth;
+    char** parameters;
 }item;
 
 item** create_hash(int n);
 
 item** resize_hash(int prev_n, int new_n, item** itemp_array);
 
-item* search(item* items, size_t size, const char* key);
+item* search_var(item** items, size_t size, const char* key);
 
 
 

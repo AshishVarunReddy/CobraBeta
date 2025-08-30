@@ -4,6 +4,7 @@
 #include"lexerf.h"
 #include"parserf.h"
 #include"codegeneratorf.h"
+#include"hashtable.h"
 
 extern int token_index;
 
@@ -26,9 +27,16 @@ int main(int argc, char** argv){
       print_token(tokenArray[i]);
   }
  
- Node* parseNode = parser(tokenArray);
+ item*** variable_s;
+ variable_s = (item***)malloc(sizeof(item**));
+ Node* parseNode = parser(tokenArray, variable_s);
+ printf("holy\n");
+ item** s = *variable_s;
+ for(int i = 0; i<2; i++){
+     printf("sigilite: %s\n", s[i]->key);
+ }
 
- generate_code(parseNode);
+ generate_code(parseNode, variable_s);
 
   fclose(fp);
   free(tokenArray);

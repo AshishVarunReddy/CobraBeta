@@ -9,6 +9,7 @@
 #include"codegeneratorf.h"
 #include<unistd.h>
 #include<wait.h>
+#include"hashtable.h"
 
 
 extern int var_num;
@@ -81,7 +82,7 @@ int sysgen(char* call){
 }
 
 
-static int num_vars = 1;
+int num_vars = 0;
 
 int calculate_node(Node** op_node, FILE* fp){
     
@@ -121,7 +122,7 @@ int calculate_node(Node** op_node, FILE* fp){
 }
 
 
-void traverse(Node* root, FILE* fp, calls* c){
+void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
     if(!root){
         return;
     }
@@ -139,14 +140,25 @@ void traverse(Node* root, FILE* fp, calls* c){
         printf("( appeared\n");
     }
 
+    if(root->type == IDENTIFIER){
+        item* i;
+        if((i = search_var(variable_s, num_vars, root->value))){
+            fprintf(fp, "mov r10, [rbp - %d]\n", i->depth);
+            root->value = i->value;
+        }
+    }
+
     if(!strcmp(root->value, ")")){
         printf(") appeared\n");
     }
     int t = (root->type);
     if((t == INT || t == OPERATOR) && *root->value != '='){
-        int num = calculate_node(&root, fp);
-        printf("Magnetar:%s\n", root->value);
+        int num;
+        if(t == OPERATOR)
+             num = calculate_node(&root, fp);
+        else num = atoi(root->value);
 
+        printf("Magnetar:%s\n", root->value);
         printf("black hole: %d\n", num);
         free(root->right);
         free(root->left);
@@ -154,6 +166,9 @@ void traverse(Node* root, FILE* fp, calls* c){
         root->left = NULL;
         if(c->var_name){
             c->number = atoi(root->value);
+            printf("quasar\n");
+            variable_s[num_vars] -> value = root->value;
+            printf("digdog: %s, %d, %s\n", root->value, num_vars, variable_s[num_vars]->value);
         }
 
         fprintf(fp, "mov r10, rax\n");
@@ -171,24 +186,25 @@ void traverse(Node* root, FILE* fp, calls* c){
         fprintf(fp, "%s:\nmov rax, %d\nmov rdi, r10\n", c->func_call, c->number);
         fprintf(fp, "syscall\n");
         }else if(c->var_name){
-            fprintf(fp,"sub rsp, 4\nmov dword [rbp-%d], %d\n", 4*num_vars, c->number);
+            variable_s[num_vars] ->depth = 4*(num_vars+1);
+            fprintf(fp,"sub rsp, 4\nmov dword [rbp-%d], %s\n", 4*(num_vars+1), variable_s[num_vars]->value);
             num_vars++;
         }
     }
     if(root->left)
-        traverse(root->left, fp, c);
+        traverse(root->left, fp, c, variable_s);
     if(root->right)
-        traverse(root->right, fp, c);
+        traverse(root->right, fp, c, variable_s);
 }
 
-int generate_code(Node* root){
+int generate_code(Node* root, item*** variable_s){
     FILE* f = fopen("./assembly/gencra.asm", "w");
     if(!f){
         perror("File not opened!!\n");
         exit(1);
     }
-    
-    
+    printf("Dumbass\n");
+   
     calls* c = (calls*)malloc(sizeof(calls));
     c->func_call = NULL;
     c->var_name = NULL;
@@ -202,8 +218,12 @@ int generate_code(Node* root){
     if(var_num > 0){
         fprintf(f, "push rbp\nmov rbp, rsp\n");
     }
-    traverse(root, f, c);
+    traverse(root, f, c, *variable_s);
     fclose(f);
+    
+    for(int i = 0; i<var_num; i++){
+        printf("sigismund: %s -> %s -> %d\n", (*variable_s)[i]->key, (*variable_s)[i]->value, (*variable_s)[i]->depth);
+    }
     
     
     pid_t id = fork();
