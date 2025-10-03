@@ -128,9 +128,6 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
     }
     if(!strcmp(root->value, "exit")){
         printf("exits\n");
-        //fprintf(fp, "exit:\n");
-        //fprintf(fp, "mov rax, %d\n", sysgen("exit"));
-        printf("SOLAR\n");
         c->func_call = "exit";
         c->var_name = NULL;
         c->number = sysgen("exit");
@@ -157,18 +154,20 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
         if(t == OPERATOR)
              num = calculate_node(&root, fp);
         else num = atoi(root->value);
+        if(t == INT){
+            fprintf(fp, "mov rax, %s\n", root->value);
+        }
 
-        printf("Magnetar:%s\n", root->value);
-        printf("black hole: %d\n", num);
+        printf("163code:%s\n", root->value);
+        printf("164code: %d\n", num);
         free(root->right);
         free(root->left);
         root->right = NULL;
         root->left = NULL;
         if(c->var_name){
             c->number = atoi(root->value);
-            printf("quasar\n");
             variable_s[num_vars] -> value = root->value;
-            printf("digdog: %s, %d, %s\n", root->value, num_vars, variable_s[num_vars]->value);
+            printf("172code: %s, %d, %s\n", root->value, num_vars, variable_s[num_vars]->value);
         }
 
         fprintf(fp, "mov r10, rax\n");
@@ -203,7 +202,7 @@ int generate_code(Node* root, item*** variable_s){
         perror("File not opened!!\n");
         exit(1);
     }
-    printf("Dumbass\n");
+    printf("207code\n");
    
     calls* c = (calls*)malloc(sizeof(calls));
     c->func_call = NULL;
@@ -222,7 +221,7 @@ int generate_code(Node* root, item*** variable_s){
     fclose(f);
     
     for(int i = 0; i<var_num; i++){
-        printf("sigismund: %s -> %s -> %d\n", (*variable_s)[i]->key, (*variable_s)[i]->value, (*variable_s)[i]->depth);
+        printf("226code: %s -> %s -> %d\n", (*variable_s)[i]->key, (*variable_s)[i]->value, (*variable_s)[i]->depth);
     }
     
     

@@ -30,12 +30,9 @@ int main(int argc, char** argv){
  item*** variable_s;
  variable_s = (item***)malloc(sizeof(item**));
  Node* parseNode = parser(tokenArray, variable_s);
- printf("holy\n");
  item** s = *variable_s;
- for(int i = 0; i<2; i++){
-     printf("sigilite: %s\n", s[i]->key);
- }
 
+ printf("holy\n");
  generate_code(parseNode, variable_s);
 
   fclose(fp);

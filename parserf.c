@@ -253,6 +253,7 @@ int handle_exit_syscall(Token** tokenArray, Node* current_node, int i, item** va
             current_node->left = numNode;
             current_node = exitNode->left;
             current_token = tokenArray[++i];
+            printf("The INTEGER\n");
         }
         else if(tokenArray[i]->Type == INT){
             expression_string_generator(tokenArray, current_node, &i, 1);

@@ -107,7 +107,7 @@ Token** lexer(FILE* fp){
     buffer[len] = '\0';
     fread(buffer, 1, len, fp);
     *(buffer+ sizeof(char)*len - 1) = '\0';
-    printf("Buffer: %s\n", buffer);
+    printf("Buffer:\n%s\n", buffer);
     char* current = buffer;
     int current_index = 0;
     Token** tokenArray = (Token**)malloc(sizeof(Token*)*12);
