@@ -22,7 +22,7 @@ void print_token(Token* token){
             printf("Type: SEPARATOR\n");
             break;
         case IDENTIFIER:
-            printf("Type : IDENTIFIER\n");
+            printf("Type : IDENTIFIER and %lu\n", strlen(token->value));
             break;
         case OPERATOR:
             printf("Type: OPERATOR\n");
@@ -70,7 +70,8 @@ Token* gen_key_or_ident(int* current_index, char* current){
     }
 
     keyword_char[keyword_index] = '\0';
-
+    //keyword = (char*)realloc(keyword, keyword_index+1);
+    *(keyword + keyword_index) = '\0';
     if(!strcmp(keyword_char, "exit")){
         key->Type = KEYWORD;
         key->value = keyword;
@@ -81,6 +82,7 @@ Token* gen_key_or_ident(int* current_index, char* current){
     }else{
         key->Type = IDENTIFIER;
         key->value = keyword;
+        printf("l84: %lu\n", strlen(keyword));
     }
     return key;
 }

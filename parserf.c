@@ -235,7 +235,10 @@ char** expression_string_generator(Token** tokenArray, Node* current_node, int* 
     return expr;
 
 }
-
+void printtok(const char* s, Token* token){
+  printf("%s", s);
+  print_token(token);
+}
 int handle_exit_syscall(Token** tokenArray, Node* current_node, int i, item** variable_table){
         Token* current_token = tokenArray[i];
         Node* exitNode = create_node(current_token->value, KEYWORD);
@@ -260,6 +263,7 @@ int handle_exit_syscall(Token** tokenArray, Node* current_node, int i, item** va
             current_token = tokenArray[i];
             
         }else if(tokenArray[i]->Type == IDENTIFIER){
+            print_token(current_token);
             if(search_var(variable_table, var_num, current_token->value)){
                 Node* var_node = create_node(current_token->value, current_token->Type);
                 current_node ->left = var_node;
@@ -294,6 +298,7 @@ int handle_exit_syscall(Token** tokenArray, Node* current_node, int i, item** va
     return i;
 }
 int create_variable(Token** tokenArray, Node**current_node, int i, item** variable_item){
+    int sks;
     Node* initial = *current_node;
     Node* stopNode;
     Token* current_token = tokenArray[i];
@@ -308,8 +313,11 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
         exit(1);
     }
     if(tokenArray[i]->Type == IDENTIFIER){
+        print_token(tokenArray[i]);
+        sks = i;
         Node* ident_node = create_node(tokenArray[i]->value, tokenArray[i]->Type);
         (*variable_item)->key = tokenArray[i]->value;
+        printf("par315: %s\n", (*variable_item)->key);
         (*current_node)->left = ident_node;
         *current_node = ident_node;
         i++;
@@ -345,6 +353,8 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
         perror("Expected int, got something else\n");
         exit(1);
     }*/
+    printf("p355\n");
+    print_token(tokenArray[sks]);
     if(tokenArray[i]->Type == SEPARATOR){
         if(*tokenArray[i]->value == ';'){
             Node* semi_node = create_node(tokenArray[i]->value, tokenArray[i]->Type);
@@ -383,11 +393,22 @@ Node* parser(Token** tokenArray, item*** variable_s){
         switch(current_token->Type){
             case KEYWORD:
                 if(!strcmp(current_token->value, "exit")){
+                    printtok("p399", tokenArray[i+2]);
                     i =  handle_exit_syscall(tokenArray,  current_node, i, variable_table);
                     i--;
                 }else if(!strcmp(current_token->value, "int")){
+                    int sks = i;
+                    if(sks - 10 >= 0){
+                          printtok("p411", tokenArray[sks-10]);
+                      }
                     i = create_variable(tokenArray, &current_node, i, &current_item);
+                    printf("par394: %s5\n", current_item->key);
+                    printtok("p404", tokenArray[sks+1]);
                     current_item = variable_table[++var_it];
+                    if(sks - 10 >= 0){
+                        printtok("p414", tokenArray[sks-10]);
+                    }
+
                 }
                 print_tree(root, "root", 0);
                 break;

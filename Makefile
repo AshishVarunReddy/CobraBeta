@@ -1,4 +1,4 @@
-cc=gcc
+cc=clang
 source=comp.c lexerf.c
 output=comp
 cflags=-Wall --static -g

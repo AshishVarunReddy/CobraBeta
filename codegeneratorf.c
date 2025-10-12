@@ -105,7 +105,7 @@ int calculate_node(Node** op_node, FILE* fp){
     if((*op_node)->left->type == INT && (*op_node)->right->type == INT){
         int a = atoi((*op_node)->left->value);
         int b = atoi((*op_node)->right->value);
-        int digit = operations_asm(a, b, *((*op_node)->value), fp);
+        int digit = operations_int(a, b, *((*op_node)->value));
 
         if(digit < 0){
             char* newbf = (char*)malloc(sizeof(char) * strlen((*op_node)->value)+2);
@@ -154,9 +154,9 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
         if(t == OPERATOR)
              num = calculate_node(&root, fp);
         else num = atoi(root->value);
-        if(t == INT){
+       // if(t == INT){
             fprintf(fp, "mov rax, %s\n", root->value);
-        }
+        //}
 
         printf("163code:%s\n", root->value);
         printf("164code: %d\n", num);
