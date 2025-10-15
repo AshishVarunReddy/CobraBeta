@@ -82,7 +82,6 @@ Token* gen_key_or_ident(int* current_index, char* current){
     }else{
         key->Type = IDENTIFIER;
         key->value = keyword;
-        printf("l84: %lu\n", strlen(keyword));
     }
     return key;
 }

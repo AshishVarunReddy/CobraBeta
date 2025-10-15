@@ -10,7 +10,7 @@
 #include<unistd.h>
 #include<wait.h>
 #include"hashtable.h"
-
+#include<stdint.h>
 
 extern int var_num;
 
@@ -84,7 +84,7 @@ int sysgen(char* call){
 
 int num_vars = 0;
 
-int calculate_node(Node** op_node, FILE* fp){
+int calculate_node(Node** op_node, FILE* fp, item** variable_s){
     
     if(!(*op_node)){
         perror("error op tree\n");
@@ -95,14 +95,40 @@ int calculate_node(Node** op_node, FILE* fp){
     }
 
     if((*op_node)->left->type == OPERATOR){
-        calculate_node(&((*op_node)->left), fp);
+        calculate_node(&((*op_node)->left), fp, variable_s);
     }
 
     if((*op_node)->right->type == OPERATOR){
-        calculate_node(&((*op_node)->right), fp);
+        calculate_node(&((*op_node)->right), fp, variable_s);
     }
 
-    if((*op_node)->left->type == INT && (*op_node)->right->type == INT){
+    if(((*op_node)->left->type == INT || (*op_node)->left->type == IDENTIFIER) && ((*op_node)->right->type == INT || (*op_node)->right->type == IDENTIFIER)){
+        if((*op_node)->left->type == IDENTIFIER){
+      printf("Hello motherfuckers\n");
+      item* changers = search_var(variable_s, var_num, (*op_node)->left->value);
+      if(changers->value == NULL){
+        perror("Variable not initialized\n");
+        exit(1);
+      }else{
+        (*op_node)->left->value = changers->value;
+        (*op_node)->left->type = INT;
+        printf("code114:%s\n", changers->value);
+      }
+    }
+
+       if((*op_node)->right->type == IDENTIFIER){
+      printf("Hello right motherfukcers\n");
+            item* changers = search_var(variable_s, var_num, (*op_node)->right->value);
+            if(changers->value == NULL){
+              perror("Variable not initialized\n");
+              exit(1);
+            }else{
+              (*op_node)->right->value = changers->value;
+              (*op_node)->right->type = INT;
+              printf("code126: %s\n", changers->value);
+            }
+          }
+
         int a = atoi((*op_node)->left->value);
         int b = atoi((*op_node)->right->value);
         int digit = operations_int(a, b, *((*op_node)->value));
@@ -120,7 +146,7 @@ int calculate_node(Node** op_node, FILE* fp){
     }
    return atoi((*op_node)->value);
 }
-
+int16_t nbuf = 1;
 
 void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
     if(!root){
@@ -152,7 +178,7 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
     if((t == INT || t == OPERATOR) && *root->value != '='){
         int num;
         if(t == OPERATOR)
-             num = calculate_node(&root, fp);
+             num = calculate_node(&root, fp, variable_s);
         else num = atoi(root->value);
        // if(t == INT){
             fprintf(fp, "mov rax, %s\n", root->value);
@@ -185,8 +211,8 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
         fprintf(fp, "%s:\nmov rax, %d\nmov rdi, r10\n", c->func_call, c->number);
         fprintf(fp, "syscall\n");
         }else if(c->var_name){
-            variable_s[num_vars] ->depth = 4*(num_vars+1);
-            fprintf(fp,"sub rsp, 4\nmov dword [rbp-%d], %s\n", 4*(num_vars+1), variable_s[num_vars]->value);
+            variable_s[num_vars] ->depth = 4*(num_vars+nbuf);
+            fprintf(fp,"sub rsp, 4\nmov dword [rbp-%d], %s\n", 4*(num_vars+nbuf), variable_s[num_vars]->value);
             num_vars++;
         }
     }

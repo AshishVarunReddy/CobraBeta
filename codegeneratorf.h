@@ -18,7 +18,7 @@ int operations_asm(int a, int b, char op, FILE* fp);
 
 int sysgen(char* call);
 
-int calculate_node(Node** op_node, FILE* fp);
+int calculate_node(Node** op_node, FILE* fp, item** variable_s);
 
 void traverse(Node* root, FILE* fp, calls* c, item** variable_s);
 

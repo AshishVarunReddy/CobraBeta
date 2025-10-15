@@ -10,4 +10,3 @@ assembly/test.o
 assembly/test
 assembly/Makefile
 stackf.o
-cobra

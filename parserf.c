@@ -102,13 +102,13 @@ static int x = 0;
 Node* generate_operation_tree(char** expression_array, int lt){
        if(lt <= x)return NULL;
        char* sl = expression_array[x];
-       Node* node = create_node(expression_array[x], (isalnum(*sl) || atoi(sl)<0) ? INT : OPERATOR);
+       Node* node = create_node(expression_array[x], (isalnum(*(sl)) || atoi(sl)<0) ? (isalpha(*(sl))) ? IDENTIFIER: INT : OPERATOR);
+        
        x++;
        
-       if(node->type == INT){
+       if(node->type == INT || node->type == IDENTIFIER){
            return node;
        }
-
        node->left = generate_operation_tree(expression_array,  lt);
 
        node->right = generate_operation_tree(expression_array,  lt);
@@ -125,89 +125,95 @@ char** expression_string_generator(Token** tokenArray, Node* current_node, int* 
      }else{
          push(&st, "BUFFERS");
      }
-    if(!strcmp(current_token->value, "(") || current_token->Type == INT || *current_token->value == '-'){
+    if(!strcmp(current_token->value, "(") || current_token->Type == INT || *current_token->value == '-' || current_token->Type == IDENTIFIER){
         if(current_token->Type == INT && *tokenArray[*ip + 1]->value == ';'){
         Node* expr_node = create_node(current_token->value, current_token->Type);
         current_node->left = expr_node;
         expr[0] = current_token->value;
         return expr;
         }
-            int j = *ip;
-            int iter = 0;
-            while(empty_stack(st) == 0 && tokenArray[j]->Type != EOFILE){
-                if(*tokenArray[j]->value == ';' && inParen == 0){
-                    popStack(&st);
-                }
-              if(inParen == 1){
-                if(strcmp(tokenArray[j] -> value, ")")){
-                     push(&st, tokenArray[j]->value);
-                }else{
-                    while(strcmp(peep(st), "(")){
-                         popStack(&st);
-                    }
-                     popStack(&st);
-                }
+          int j = *ip;
+          int iter = 0;
+          while(empty_stack(st) == 0 && tokenArray[j]->Type != EOFILE){
+              if(tokenArray[j]->Type == KEYWORD){
+        int* s = NULL;
+        perror("KEYWORD occured before semicolon\n");
+        exit(1);
+      }
+              if(*tokenArray[j]->value == ';' && inParen == 0){
+                  popStack(&st);
               }
-              if(empty_stack(st) == 0){
-                if(iter == 0 && (*tokenArray[j]->value == '-')){
-                    expr[iter++] = "0";
-                    }else if((tokenArray[j-1]->Type == OPERATOR && *tokenArray[j-1]->value != '=') && *tokenArray[j]->value == '-'){
-                        if(tokenArray[j+1]->Type == INT){
-                            int ln = strlen(tokenArray[j+1]->value);
-                            char* bf = (char*)malloc(sizeof(char*)*(ln+2));
-                            bf[ln+1] = '\0';
-                            sprintf(bf, "-%s", tokenArray[j+1]->value);
-                            tokenArray[j]->value = bf;
-                            tokenArray[j]->Type = INT;
-                            printf("BOSON\n");
-                            j+=2;
-                            expr[iter] = bf;
-                            iter++;
-                            continue;
-                        }else if(*tokenArray[j+1]->value == '('){
-                            stack* substack = create_stack_element("STACK_END");
-                            push(&substack, "BUFFER");
-                            int k = j;
-                            k++;
-                            push(&st, tokenArray[k]->value);
-                            expr[iter++] = tokenArray[k++]->value;
-                            push(&st, "0");
-                            expr[iter++] = "0";
-                            push(&st, "-");
-                            expr[iter++] = "-";
-                            j+=2;
-                            k = j;
-                            while(empty_stack(substack) == 0){
-                              char* substr = tokenArray[k]->value;
-                              if(*substr == '('){
-                                push(&substack, "(");
-                              }else if(*substr == ')'){
-                                  while(*peep(substack) != '(' && strcmp(peep(substack), "BUFFER")){
-                                        popStack(&substack);
-                                    }
-                                  popStack(&substack);
-                              }else if((*substr == '+' || *substr == '-') && !strcmp(peep(substack), "BUFFER")){
-                                  if(*substr == '+'){
-                                        *substr = '-';
-                                    }else{
-                                        if(*tokenArray[k-1]->value == '/' || *tokenArray[k-1]->value == '*')
-                                            *substr = '-';
-                                        else
-                                            *substr = '+';
-                                    }
-                                }
-                                k++;
-                            }
-                        }
-                    }
-            if(*tokenArray[j]->value != ' '){
+            if(inParen == 1){
+              if(strcmp(tokenArray[j] -> value, ")")){
+                   push(&st, tokenArray[j]->value);
+              }else{
+                  while(strcmp(peep(st), "(")){
+                       popStack(&st);
+                  }
+                   popStack(&st);
+              }
+            }
+            if(empty_stack(st) == 0){
+              if(iter == 0 && (*tokenArray[j]->value == '-')){
+                  expr[iter++] = "0";
+                  }else if((tokenArray[j-1]->Type == OPERATOR && *tokenArray[j-1]->value != '=') && *tokenArray[j]->value == '-'){
+                      if(tokenArray[j+1]->Type == INT){
+                          int ln = strlen(tokenArray[j+1]->value);
+                          char* bf = (char*)malloc(sizeof(char*)*(ln+2));
+                          bf[ln+1] = '\0';
+                          sprintf(bf, "-%s", tokenArray[j+1]->value);
+                          tokenArray[j]->value = bf;
+                          tokenArray[j]->Type = INT;
+                          printf("BOSON\n");
+                          j+=2;
+                          expr[iter] = bf;
+                          iter++;
+                          continue;
+                      }else if(*tokenArray[j+1]->value == '('){
+                          stack* substack = create_stack_element("STACK_END");
+                          push(&substack, "BUFFER");
+                          int k = j;
+                          k++;
+                          push(&st, tokenArray[k]->value);
+                          expr[iter++] = tokenArray[k++]->value;
+                          push(&st, "0");
+                          expr[iter++] = "0";
+                          push(&st, "-");
+                          expr[iter++] = "-";
+                          j+=2;
+                          k = j;
+                          while(empty_stack(substack) == 0){
+                            char* substr = tokenArray[k]->value;
+                            if(*substr == '('){
+                              push(&substack, "(");
+                            }else if(*substr == ')'){
+                                while(*peep(substack) != '(' && strcmp(peep(substack), "BUFFER")){
+                                      popStack(&substack);
+                                  }
+                                popStack(&substack);
+                            }else if((*substr == '+' || *substr == '-') && !strcmp(peep(substack), "BUFFER")){
+                                if(*substr == '+'){
+                                      *substr = '-';
+                                  }else{
+                                      if(*tokenArray[k-1]->value == '/' || *tokenArray[k-1]->value == '*')
+                                          *substr = '-';
+                                      else
+                                          *substr = '+';
+                                  }
+                              }
+                              k++;
+                          }
+                      }
+                  }
+            if(*tokenArray[j]->value != ' ' && tokenArray[j]->Type != KEYWORD){
                 expr[iter++] = tokenArray[j]->value;
             }
             j++;
             }
         }
+            printf("\npars209: ");
             for(int p = 0; p<iter; p++){
-                printf("%s ",expr[p]);
+                printf("%s /",expr[p]);
             }
             printf("\n");
             //printf("black hole:%s\n", exp_convertor(expr, iter));
@@ -240,6 +246,10 @@ void printtok(const char* s, Token* token){
   print_token(token);
 }
 int handle_exit_syscall(Token** tokenArray, Node* current_node, int i, item** variable_table){
+        if(i > 0 && *tokenArray[i-1]->value != ';'){
+    perror("Function call must be first token or preceded by semicolon\n");
+    exit(1);
+  }
         Token* current_token = tokenArray[i];
         Node* exitNode = create_node(current_token->value, KEYWORD);
         current_node->right = exitNode;
@@ -344,15 +354,8 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
         i++;
     }else
         expression_string_generator(tokenArray, *current_node, &i, 0); 
-    /*if(tokenArray[i]->Type == INT){
-        Node* varInt_node = create_node(tokenArray[i]->value, tokenArray[i]->Type);
-        current_node->left = varInt_node;
-        current_node = stopNode;
-        i++;
-    }else{
-        perror("Expected int, got something else\n");
-        exit(1);
-    }*/
+    
+    
     printf("p355\n");
     print_token(tokenArray[sks]);
     if(tokenArray[i]->Type == SEPARATOR){
@@ -366,7 +369,10 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
             }else{
                 *current_node = initial;
             }
-        }
+        }else{
+      perror("No semicolon at the end\n");
+      exit(1);
+    }
     }
     return i;
 }

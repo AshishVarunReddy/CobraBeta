@@ -33,13 +33,11 @@ item** resize_hash(int prev_n, int new_n, item** itemp_array){
 
 item* search_var(item** items, size_t size, const char* key){
     for(int i = 0; i<size; i++){
-        printf("hsh35: s%ss and s%ss and %lu and %lu\n", items[i]->key, key, strlen(items[i]->key), strlen(key));
         if(!strcmp(key, items[i]->key)){
             return items[i];
         }
     }
 
-    printf("hsh41: BLyat %ss\n", key);
 
     return NULL;
 }
