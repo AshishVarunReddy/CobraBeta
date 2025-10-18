@@ -235,6 +235,7 @@ char** expression_string_generator(Token** tokenArray, Node* current_node, int* 
             printf("black Hole: %s\n", current_token->value);
         
         }else{
+            print_token(current_token);
             perror("Syntax Error at int or anthing else\n");
             exit(2);
         }
@@ -377,6 +378,32 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
     return i;
 }
 
+void edit_variable(item* variable, Token** tokenArray, int* ip){
+      printf("381pars\n");
+      int i = *ip;
+      i++;
+      if(*tokenArray[i]->value != '='){
+          printf("Found no assignment sign. Aborting the compilation...");
+          exit(1);
+      }
+      *ip = i+1;
+      Node* s_node = create_node("Nothing", SEPARATOR);
+      expression_string_generator(tokenArray, s_node, ip, 0);
+      Node* del = s_node;
+      s_node = s_node->left;
+      free(del);
+      (variable)->totaledits++;
+      Node** editArray;
+      if(variable->edits == NULL){
+          editArray = (Node**)malloc(sizeof(Node*));
+          editArray[variable->totaledits-1] = s_node;
+      }else{
+          editArray = (Node**)realloc(editArray, variable->totaledits);
+          editArray[variable->totaledits-1] = s_node;
+      }
+    printf("402par: %s\n", tokenArray[*ip]->value);
+}
+
 item** symbol_returner(item** itemizer){
     return itemizer;
 }
@@ -416,12 +443,24 @@ Node* parser(Token** tokenArray, item*** variable_s){
                     }
 
                 }
+                printf("444pars\n");
                 print_tree(root, "root", 0);
                 break;
             case SEPARATOR:
                 printf("SEPERATOR_IDENTIFIED\n");
                 break;
             case IDENTIFIER:
+                if(i > 0 && *tokenArray[i-1]->value == ';'){
+                  item* found_item;
+                  printf("454pars->%d\n", var_num);
+                  if((found_item = search_var(variable_table, var_num, current_token->value))){
+                        printf("455pars\n");
+                        edit_variable(found_item, tokenArray, &i);
+                  }else{
+                        printf("Cannot edit undeclared variables. Aborting...\n");
+                        exit(1);
+                  }
+                }
                 printf("IDENTIFIER identified\n");
                 break;
             case INT:

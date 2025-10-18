@@ -104,7 +104,6 @@ int calculate_node(Node** op_node, FILE* fp, item** variable_s){
 
     if(((*op_node)->left->type == INT || (*op_node)->left->type == IDENTIFIER) && ((*op_node)->right->type == INT || (*op_node)->right->type == IDENTIFIER)){
         if((*op_node)->left->type == IDENTIFIER){
-      printf("Hello motherfuckers\n");
       item* changers = search_var(variable_s, var_num, (*op_node)->left->value);
       if(changers->value == NULL){
         perror("Variable not initialized\n");
@@ -167,6 +166,18 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
         item* i;
         if((i = search_var(variable_s, num_vars, root->value))){
             fprintf(fp, "mov r10, [rbp - %d]\n", i->depth);
+            printf("Hello Mortherforkers\n");
+            if(i->editIndex == -1){
+                i->editIndex++;
+                printf("171code\n");
+            }else{
+                i->editIndex++;
+                int edi = calculate_node(((i->edits)+(i->editIndex)), fp, variable_s);
+                char* eds;
+                sprintf(eds, "%d", edi);
+                i->value = eds;
+            }
+            
             root->value = i->value;
         }
     }
@@ -184,8 +195,8 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
             fprintf(fp, "mov rax, %s\n", root->value);
         //}
 
-        printf("163code:%s\n", root->value);
-        printf("164code: %d\n", num);
+        printf("197code:%s\n", root->value);
+        printf("198code: %d\n", num);
         free(root->right);
         free(root->left);
         root->right = NULL;
@@ -193,7 +204,7 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
         if(c->var_name){
             c->number = atoi(root->value);
             variable_s[num_vars] -> value = root->value;
-            printf("172code: %s, %d, %s\n", root->value, num_vars, variable_s[num_vars]->value);
+            printf("206code: %s, %d, %s\n", root->value, num_vars, variable_s[num_vars]->value);
         }
 
         fprintf(fp, "mov r10, rax\n");

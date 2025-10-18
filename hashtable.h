@@ -3,7 +3,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<ctype.h>
-
+#include"Tree.h"
 
 #ifndef _HASHTABLE_H_
 
@@ -14,7 +14,10 @@ typedef struct item{
     char* key;
     char* value;
     int depth;
-    char** parameters;
+    char* type;
+    int editIndex;
+    int totaledits;
+    Node** edits;
 }item;
 
 item** create_hash(int n);

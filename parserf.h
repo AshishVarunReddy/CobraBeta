@@ -4,12 +4,6 @@
 
 #define PARSER_H
 
-typedef struct Node{
-    char* value;
-    Tokentype type;
-    struct Node* left;
-    struct Node* right;
-}Node;
 
 
 Node* create_node(char* value, Tokentype type);

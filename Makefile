@@ -27,4 +27,4 @@ cobra : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o
 
 clean : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o
 	rm *.o
-	$(RM) -r cobra output* *dSYM
+	$(RM) -r cobra assembly/genra output* *dSYM
