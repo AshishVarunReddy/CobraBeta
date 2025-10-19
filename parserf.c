@@ -365,7 +365,7 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
             *current_node = stopNode;
             (*current_node)->right = semi_node;
 
-            if(tokenArray[i+2] && tokenArray[i+2]->Type == IDENTIFIER){
+            if(tokenArray[i+1] && tokenArray[i+1]->Type == IDENTIFIER ||tokenArray[i+2] && tokenArray[i+2]->Type == IDENTIFIER){
                 *current_node = semi_node;
             }else{
                 *current_node = initial;
@@ -378,35 +378,60 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
     return i;
 }
 
-void edit_variable(item* variable, Token** tokenArray, int* ip){
-      printf("381pars\n");
+void edit_variable(item* variable, Token** tokenArray, int* ip, Node** current_node){
+      printf("382pars\n");
+      Node* init_node = *current_node;
       int i = *ip;
+      Node* editVar = create_node(tokenArray[i]->value, tokenArray[i]->Type);
+      (*current_node)->left = editVar;
+      (*current_node) = (*current_node)->left;
+      Node* stopNode = (*current_node);
+      
       i++;
       if(*tokenArray[i]->value != '='){
-          printf("Found no assignment sign. Aborting the compilation...");
+          printf("Found no assignment sign. Aborting the compilation...\n");
           exit(1);
       }
-      *ip = i+1;
-      Node* s_node = create_node("Nothing", SEPARATOR);
-      expression_string_generator(tokenArray, s_node, ip, 0);
-      Node* del = s_node;
-      s_node = s_node->left;
-      free(del);
-      (variable)->totaledits++;
-      Node** editArray;
-      if(variable->edits == NULL){
-          editArray = (Node**)malloc(sizeof(Node*));
-          editArray[variable->totaledits-1] = s_node;
+      Node* eqNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
+      (*current_node)->left = eqNode;
+      (*current_node) = (*current_node)->left; 
+      *ip = ++i;
+      if(tokenArray[i]->Type == INT && *tokenArray[i+1]->value == ';'){
+          Node* numNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
+          (*current_node)->left = numNode;
+          (*ip)++;
       }else{
-          editArray = (Node**)realloc(editArray, variable->totaledits);
-          editArray[variable->totaledits-1] = s_node;
+         expression_string_generator(tokenArray, *current_node, ip, 0);
       }
-    printf("402par: %s\n", tokenArray[*ip]->value);
+      (*current_node) = stopNode; //slightly different from creating variable. We move back to the identifier instead of data_type keyword.
+      i = *ip;
+      if(*tokenArray[i]->value != ';'){
+          printtok("408pars: ", tokenArray[i]);
+          printf("No semicolon at the end of the statment. Aborting...\n");
+          exit(1);
+      }
+      Node* semiNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
+      int iss = 4;
+      printf("414pars: %s\n", semiNode->value);
+      (*current_node)->right = semiNode;
+      if((tokenArray[i+1] && tokenArray[i+1]->Type == IDENTIFIER) ||(tokenArray[i+2] && tokenArray[i+2]->Type == IDENTIFIER)){
+          *current_node = semiNode;
+          iss = 20;
+      }else{
+          printf("421pars Duckfudks: %s : %s\n", tokenArray[i+1]->value, tokenArray[i+2]->value);
+          *current_node = init_node;
+          iss = 30;
+      }
+      printf("425pars: %d\n", iss);
+      print_tree(init_node, "edit", 0);
 }
 
 item** symbol_returner(item** itemizer){
     return itemizer;
 }
+
+int var_tracer = 0;
+
 
 Node* parser(Token** tokenArray, item*** variable_s){
     Token* current_token = tokenArray[0];
@@ -435,8 +460,7 @@ Node* parser(Token** tokenArray, item*** variable_s){
                           printtok("p411", tokenArray[sks-10]);
                       }
                     i = create_variable(tokenArray, &current_node, i, &current_item);
-                    printf("par394: %s5\n", current_item->key);
-                    printtok("p404", tokenArray[sks+1]);
+                    var_tracer++;
                     current_item = variable_table[++var_it];
                     if(sks - 10 >= 0){
                         printtok("p414", tokenArray[sks-10]);
@@ -453,13 +477,18 @@ Node* parser(Token** tokenArray, item*** variable_s){
                 if(i > 0 && *tokenArray[i-1]->value == ';'){
                   item* found_item;
                   printf("454pars->%d\n", var_num);
-                  if((found_item = search_var(variable_table, var_num, current_token->value))){
-                        printf("455pars\n");
-                        edit_variable(found_item, tokenArray, &i);
+                  if((found_item = search_var(variable_table, var_tracer, current_token->value))){
+                        printf("478pars: UndeclaredKing\n");
+                        edit_variable(found_item, tokenArray, &i, &current_node);
+                        printf("490pars: %s\n", current_node->value);
+                        print_tree(current_node, "totalTreeAfterediting", 0);
                   }else{
                         printf("Cannot edit undeclared variables. Aborting...\n");
                         exit(1);
                   }
+                }else{
+                    printf("A program starting with editing variables, or missing a semicolon. Rookie Mistakes. Aborting...\n");
+                    exit(1);
                 }
                 printf("IDENTIFIER identified\n");
                 break;

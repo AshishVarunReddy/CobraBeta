@@ -164,21 +164,14 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
 
     if(root->type == IDENTIFIER){
         item* i;
+        if(root->left && *(root->left->value) == '='){
+          c->var_name = root->value;
+          c->func_call = NULL;
+        }
         if((i = search_var(variable_s, num_vars, root->value))){
             fprintf(fp, "mov r10, [rbp - %d]\n", i->depth);
-            printf("Hello Mortherforkers\n");
-            if(i->editIndex == -1){
-                i->editIndex++;
-                printf("171code\n");
-            }else{
-                i->editIndex++;
-                int edi = calculate_node(((i->edits)+(i->editIndex)), fp, variable_s);
-                char* eds;
-                sprintf(eds, "%d", edi);
-                i->value = eds;
-            }
-            
             root->value = i->value;
+            printf("173code: %s\n", root->value);
         }
     }
 
@@ -202,29 +195,37 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
         root->right = NULL;
         root->left = NULL;
         if(c->var_name){
+            item* sResult = search_var(variable_s, var_num, c->var_name);
+            printf("202code: %d\n", var_num);
             c->number = atoi(root->value);
-            variable_s[num_vars] -> value = root->value;
-            printf("206code: %s, %d, %s\n", root->value, num_vars, variable_s[num_vars]->value);
+            sResult -> value = root->value;
+            printf("206code: %s, %d, %s\n", root->value, num_vars, sResult->value);
         }
-
         fprintf(fp, "mov r10, rax\n");
     }
 
     if(!strcmp(root->value, "int")){
-        printf("variable appeared\n");
-        c->var_name = root->left->value;
-        c->func_call = NULL;
+        printf("variable initialised\n");
     }
 
     if((c->func_call || c->var_name) && !strcmp(root->value, ";")){
-        printf("; appeared\n");
+        printf("; appeared 211 code\n");
         if(c->func_call && !strcmp(c->func_call, "exit")){
+        printf("213code\n");
         fprintf(fp, "%s:\nmov rax, %d\nmov rdi, r10\n", c->func_call, c->number);
         fprintf(fp, "syscall\n");
         }else if(c->var_name){
-            variable_s[num_vars] ->depth = 4*(num_vars+nbuf);
-            fprintf(fp,"sub rsp, 4\nmov dword [rbp-%d], %s\n", 4*(num_vars+nbuf), variable_s[num_vars]->value);
-            num_vars++;
+            printf("216 code: sagittarius\n");
+            item* searchResult = search_var(variable_s, var_num, c->var_name);
+            if(searchResult->depth == -1){
+                searchResult->depth = 4*(num_vars+nbuf);
+                fprintf(fp,"sub rsp, 4\nmov dword [rbp-%d], %s\n", 4*(num_vars+nbuf), searchResult->value);
+                printf("220code: %s -> %d\n", searchResult->value, searchResult->depth);
+                num_vars++;
+            }else{
+                fprintf(fp, "mov dword [rbp-%d], %s\n", searchResult->depth, searchResult->value);
+                printf("224code: %s -> %d\n", searchResult->value, searchResult->depth);
+            }
         }
     }
     if(root->left)
@@ -239,7 +240,7 @@ int generate_code(Node* root, item*** variable_s){
         perror("File not opened!!\n");
         exit(1);
     }
-    printf("207code\n");
+    printf("240code\n");
    
     calls* c = (calls*)malloc(sizeof(calls));
     c->func_call = NULL;
@@ -258,7 +259,7 @@ int generate_code(Node* root, item*** variable_s){
     fclose(f);
     
     for(int i = 0; i<var_num; i++){
-        printf("226code: %s -> %s -> %d\n", (*variable_s)[i]->key, (*variable_s)[i]->value, (*variable_s)[i]->depth);
+        printf("259code: %s -> %s -> %d\n", (*variable_s)[i]->key, (*variable_s)[i]->value, (*variable_s)[i]->depth);
     }
     
     

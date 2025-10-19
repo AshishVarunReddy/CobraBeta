@@ -35,16 +35,11 @@ item** resize_hash(int prev_n, int new_n, item** itemp_array){
 
 
 item* search_var(item** items, size_t size, const char* key){
-    printf("hsh38::: %zu\n", size);
     for(int i = 0; i<size; i++){
-        printf("hsh40:: %s\n", items[0]->key);
-        printf("hsh43\n");
         if(!strcmp(key, items[i]->key)){
             return items[i];
         }
-        printf("hsh44-> %d\n", i);
     }
-    printf("hsh43\n");
 
     return NULL;
 }
