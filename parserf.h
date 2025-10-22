@@ -22,5 +22,7 @@ void print_error(char* errorType);
 
 item** symbol_returner(item** itemizer);
 
+void edit_variable(item* variable, Token** tokenArray, int* ip, Node** current_node);
+
 
 #endif

@@ -33,6 +33,8 @@ void print_token(Token* token){
         case BEGINNING:
             printf("Type: BEGINNING\n");
             break;
+        case STRING:
+            printf("Type: String\n");
         default:
             printf("Undefined type\n");
     }
