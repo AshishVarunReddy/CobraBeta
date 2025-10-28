@@ -21,10 +21,13 @@ stackf.o : stackf.c stackf.h
 hashtable.o : hashtable.c hashtable.h
 	$(cc) -c hashtable.c
 
-cobra : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o
-	$(cc) $(cflags) comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o -o cobra
+_print.o : ./calls/_print.c ./calls/_print.h
+	$(cc) -c _print.c
+
+cobra : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o _print.o
+	$(cc) $(cflags) comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o _print.o -o cobra
 
 
-clean : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o
+clean : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o _print.o
 	rm *.o
 	$(RM) -r cobra assembly/genra output* *dSYM

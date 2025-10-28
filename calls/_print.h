@@ -7,4 +7,6 @@
 #include"../parserf.h"
 #include<string.h>
 #include<stdlib.h>
+
+void handle_print(Node** current_node, Token** tokenArray, int* ip);
 #endif

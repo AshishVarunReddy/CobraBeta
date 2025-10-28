@@ -1,4 +1,4 @@
-#include"syscalls/_print.h"
+#include"calls/_print.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include <string.h>
@@ -329,7 +329,6 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
         sks = i;
         Node* ident_node = create_node(tokenArray[i]->value, tokenArray[i]->Type);
         (*variable_item)->key = tokenArray[i]->value;
-        printf("par315: %s\n", (*variable_item)->key);
         (*current_node)->left = ident_node;
         *current_node = ident_node;
         i++;
@@ -358,8 +357,6 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
         expression_string_generator(tokenArray, *current_node, &i, 0); 
     
     
-    printf("p355\n");
-    print_token(tokenArray[sks]);
     if(tokenArray[i]->Type == SEPARATOR){
         if(*tokenArray[i]->value == ';'){
             Node* semi_node = create_node(tokenArray[i]->value, tokenArray[i]->Type);
@@ -380,7 +377,6 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
 }
 
 void edit_variable(item* variable, Token** tokenArray, int* ip, Node** current_node){
-      printf("382pars\n");
       Node* init_node = *current_node;
       int i = *ip;
       Node* editVar = create_node(tokenArray[i]->value, tokenArray[i]->Type);
@@ -407,23 +403,16 @@ void edit_variable(item* variable, Token** tokenArray, int* ip, Node** current_n
       (*current_node) = stopNode; //slightly different from creating variable. We move back to the identifier instead of data_type keyword.
       i = *ip;
       if(*tokenArray[i]->value != ';'){
-          printtok("408pars: ", tokenArray[i]);
           printf("No semicolon at the end of the statment. Aborting...\n");
           exit(1);
       }
       Node* semiNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
-      int iss = 4;
-      printf("414pars: %s\n", semiNode->value);
       (*current_node)->right = semiNode;
       if((tokenArray[i+1] && tokenArray[i+1]->Type == IDENTIFIER) ||(tokenArray[i+2] && tokenArray[i+2]->Type == IDENTIFIER)){
           *current_node = semiNode;
-          iss = 20;
       }else{
-          printf("421pars Duckfudks: %s : %s\n", tokenArray[i+1]->value, tokenArray[i+2]->value);
           *current_node = init_node;
-          iss = 30;
       }
-      printf("425pars: %d\n", iss);
       print_tree(init_node, "edit", 0);
 }
 
@@ -457,18 +446,13 @@ Node* parser(Token** tokenArray, item*** variable_s){
                     i--;
                 }else if(!strcmp(current_token->value, "int")){
                     int sks = i;
-                    if(sks - 10 >= 0){
-                          printtok("p411", tokenArray[sks-10]);
-                      }
                     i = create_variable(tokenArray, &current_node, i, &current_item);
                     var_tracer++;
                     current_item = variable_table[++var_it];
-                    if(sks - 10 >= 0){
-                        printtok("p414", tokenArray[sks-10]);
-                    }
 
+                }else if(!strcmp(current_token->value, "print")){
+                    handle_print(&current_node, tokenArray, &i); 
                 }
-                printf("444pars\n");
                 print_tree(root, "root", 0);
                 break;
             case SEPARATOR:

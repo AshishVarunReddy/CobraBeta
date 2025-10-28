@@ -62,7 +62,7 @@ Token* gen_key_or_ident(int* current_index, char* current){
     Token* key = (Token*)malloc(sizeof(Token));
     char* keyword = (char*)malloc(sizeof(char)*32);
     int keyword_index = 0;
-    while(isalpha(current[*current_index]) && current[*current_index] != '\0'){
+    while(isalnum(current[*current_index]) && current[*current_index] != '\0'){
         keyword[keyword_index++] = current[*current_index];
         (*current_index)++;
     }
@@ -81,11 +81,40 @@ Token* gen_key_or_ident(int* current_index, char* current){
         key->Type = KEYWORD;
         key->value = keyword;
         var_num++;
+    }else if(!strcmp(keyword_char, "print")){
+        key->Type = KEYWORD;
+        key->value = keyword;        
     }else{
         key->Type = IDENTIFIER;
         key->value = keyword;
     }
     return key;
+}
+
+Token* gen_string(int* current_index, char* current){
+    Token* token = (Token*)malloc(sizeof(Token));
+    char* string = (char*)malloc(sizeof(char)*32);
+    int len = 0;
+    int mx_len = 32;
+    while(current[*current_index] != 34 && current[(*current_index)-1] != 92){
+        if(len == mx_len){
+            mx_len *= 2;
+            string = realloc(string, mx_len);
+        }
+        if(current[*current_index] == 92){
+            if(current[*current_index - 1] != 92)continue;
+        }
+
+        string[len++] = current[(*current_index)++];
+    }
+    (*current_index)++;
+
+    string = realloc(string, len+1);
+    string[len] = '\0';
+
+    token->value = string;
+    token->Type = STRING;
+    return token;
 }
 
 Token* gen_seperator_or_operator(int* current_index, char* current, Tokentype type){
@@ -160,6 +189,9 @@ Token** lexer(FILE* fp){
         }else if(current[current_index] == '='){
             Token* eq = gen_seperator_or_operator(&current_index, current, OPERATOR);
             tokenArray[token_index++] = eq;
+        }else if(current[current_index] == 34){
+            Token* str = gen_string(&current_index, current);
+            tokenArray[token_index++] = str;
         }else{
             perror("Unknown Character");
             printf("%c\n", current[current_index]);
