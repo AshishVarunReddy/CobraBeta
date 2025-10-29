@@ -1,6 +1,5 @@
 #include"_print.h"
 
-
 void handle_print(Node** current_node, Token** tokenArray, int* ip){
     Node* init_node = (*current_node);
     if(strcmp(tokenArray[*ip]->value, "print")){
@@ -44,7 +43,7 @@ void handle_print(Node** current_node, Token** tokenArray, int* ip){
     Node* semi = create_node(tokenArray[*ip]->value, tokenArray[*ip]->Type);
     (*current_node)->right = semi;
     (*current_node) = semi;
-      
+    
 }
 
 

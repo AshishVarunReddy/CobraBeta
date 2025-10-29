@@ -146,7 +146,7 @@ int calculate_node(Node** op_node, FILE* fp, item** variable_s){
    return atoi((*op_node)->value);
 }
 int16_t nbuf = 1;
-
+int str_num = 0;
 void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
     if(!root){
         return;
@@ -156,6 +156,12 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
         c->func_call = "exit";
         c->var_name = NULL;
         c->number = sysgen("exit");
+    }
+    if(!strcmp(root->value, "print")){
+        printf("prints\n");
+        c->func_call = "print";
+        c->var_name = NULL;
+        c->number = sysgen("write");
     }
 
     if(!strcmp(root->value, "(")){
@@ -188,8 +194,6 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
             fprintf(fp, "mov rax, %s\n", root->value);
         //}
 
-        printf("197code:%s\n", root->value);
-        printf("198code: %d\n", num);
         free(root->right);
         free(root->left);
         root->right = NULL;
@@ -214,6 +218,9 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
         printf("213code\n");
         fprintf(fp, "%s:\nmov rax, %d\nmov rdi, r10\n", c->func_call, c->number);
         fprintf(fp, "syscall\n");
+        }else if(c->func_call && !strcmp(c->func_call, "print")){
+            printf("222code\n");
+
         }else if(c->var_name){
             printf("216 code: sagittarius\n");
             item* searchResult = search_var(variable_s, var_num, c->var_name);
@@ -276,7 +283,7 @@ int generate_code(Node* root, item*** variable_s){
     if(id2 == 0){
         execlp("ld", "ld", "./assembly/gencra.o", "-o", "./assembly/gencra", NULL);
         perror("ld error\n");
-        exit(-1);
+        exit(1);
     }else{
         waitpid(id2, NULL, 0);
     }
@@ -285,7 +292,7 @@ int generate_code(Node* root, item*** variable_s){
     if(id3 == 0){
         execlp("rm", "rm", "./assembly/gencra.o", NULL);
         perror("no rm\n");
-        exit(-1);
+        exit(1);
     }else{
         waitpid(id3, NULL, 0);
     }

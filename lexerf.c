@@ -91,7 +91,10 @@ Token* gen_key_or_ident(int* current_index, char* current){
     return key;
 }
 
+int str_num = 0;
+
 Token* gen_string(int* current_index, char* current){
+    str_num++;
     Token* token = (Token*)malloc(sizeof(Token));
     char* string = (char*)malloc(sizeof(char)*32);
     int len = 0;
@@ -101,10 +104,7 @@ Token* gen_string(int* current_index, char* current){
             mx_len *= 2;
             string = realloc(string, mx_len);
         }
-        if(current[*current_index] == 92){
-            if(current[*current_index - 1] != 92)continue;
-        }
-
+        
         string[len++] = current[(*current_index)++];
     }
     (*current_index)++;

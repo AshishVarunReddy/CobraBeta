@@ -22,7 +22,7 @@ hashtable.o : hashtable.c hashtable.h
 	$(cc) -c hashtable.c
 
 _print.o : ./calls/_print.c ./calls/_print.h
-	$(cc) -c _print.c
+	$(cc) -c ./calls/_print.c
 
 cobra : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o _print.o
 	$(cc) $(cflags) comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o _print.o -o cobra
