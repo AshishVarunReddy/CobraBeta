@@ -433,8 +433,6 @@ Node* parser(Token** tokenArray, item*** variable_s){
     item** variable_table = create_hash(var_num);
     item* current_item = variable_table[0];
     int var_it = 0;
-    item** string_table = create_hash(str_num);
-    item* current_str = string_table[0];
     int str_it = 0;
     while(current_token->value && current_token->Type != EOFILE){
         if(current_node == NULL){
@@ -458,7 +456,6 @@ Node* parser(Token** tokenArray, item*** variable_s){
                     handle_print(&current_node, tokenArray, &i);
                     char* s;
                     asprintf(&s, "s%d", str_it);
-                    string_table[str_it++]->key = s;
                 }
                 print_tree(root, "root", 0);
                 break;

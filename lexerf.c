@@ -91,14 +91,13 @@ Token* gen_key_or_ident(int* current_index, char* current){
     return key;
 }
 
-int str_num = 0;
 
 Token* gen_string(int* current_index, char* current){
-    str_num++;
     Token* token = (Token*)malloc(sizeof(Token));
     char* string = (char*)malloc(sizeof(char)*32);
     int len = 0;
     int mx_len = 32;
+    printf("%c\n", current[*current_index]);
     while(current[*current_index] != 34 && current[(*current_index)-1] != 92){
         if(len == mx_len){
             mx_len *= 2;
@@ -106,14 +105,17 @@ Token* gen_string(int* current_index, char* current){
         }
         
         string[len++] = current[(*current_index)++];
+        printf("lex107\n");
     }
     (*current_index)++;
-
+    printf("lex109: %s\n", string);
     string = realloc(string, len+1);
     string[len] = '\0';
 
     token->value = string;
+    printf("lex:114 -> %s\n", string);
     token->Type = STRING;
+    printf("l118: %c\n", current[*current_index]);
     return token;
 }
 
@@ -190,7 +192,10 @@ Token** lexer(FILE* fp){
             Token* eq = gen_seperator_or_operator(&current_index, current, OPERATOR);
             tokenArray[token_index++] = eq;
         }else if(current[current_index] == 34){
+            printf("194l found doublequote %c\n", *(current+1));
+            current_index++;
             Token* str = gen_string(&current_index, current);
+            current_index--;
             tokenArray[token_index++] = str;
         }else{
             perror("Unknown Character");

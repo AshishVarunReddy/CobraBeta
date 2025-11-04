@@ -81,6 +81,11 @@ int sysgen(char* call){
     return result;
 }
 
+//function that turns complex strings to something that write syscall is capable of printing..
+
+char** string_customizer(int* pieces, char* string){
+        return NULL;
+    }
 
 int num_vars = 0;
 
@@ -147,6 +152,7 @@ int calculate_node(Node** op_node, FILE* fp, item** variable_s){
 }
 int16_t nbuf = 1;
 int str_num = 0;
+int sno = 0;
 void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
     if(!root){
         return;
@@ -156,12 +162,14 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
         c->func_call = "exit";
         c->var_name = NULL;
         c->number = sysgen("exit");
+        c->value = NULL;
     }
     if(!strcmp(root->value, "print")){
         printf("prints\n");
         c->func_call = "print";
         c->var_name = NULL;
         c->number = sysgen("write");
+        c->value = root->left->left->value;
     }
 
     if(!strcmp(root->value, "(")){
@@ -220,7 +228,11 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
         fprintf(fp, "syscall\n");
         }else if(c->func_call && !strcmp(c->func_call, "print")){
             printf("222code\n");
-
+            fprintf(fp, "mov rax, 1\nmov rdi, 1\nmov rsi, m%d\nmov rdx, %zu\nsyscall\n\nsection .data\nm%d db \"%s\", 10\n", sno, strlen(c->value)+1, sno,  c->value);
+            sno++;
+            if(root->right || root->left){
+                fprintf(fp, "section .text\n");
+            }
         }else if(c->var_name){
             printf("216 code: sagittarius\n");
             item* searchResult = search_var(variable_s, var_num, c->var_name);

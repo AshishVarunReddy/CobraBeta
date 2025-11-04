@@ -26,13 +26,14 @@ void handle_print(Node** current_node, Token** tokenArray, int* ip){
     (*ip)++;
 
     if(*tokenArray[*ip]->value != ')'){
-      fprintf(stderr, "No closing brackets.. Aborting...\n");
-      exit(1);
+        fprintf(stderr, "No closing brackets.. Aborting...\n");
+        printf("print30 : %s\n", tokenArray[*ip]->value);
+        exit(1);
     }
 
     Node* cParen = create_node(tokenArray[*ip]->value, tokenArray[*ip]->Type);
     (*current_node)->right = cParen;
-    (*current_node) = init_node;
+    (*current_node) = printNode;
     (*ip)++;
 
     if(*tokenArray[*ip]->value != ';'){
@@ -43,7 +44,7 @@ void handle_print(Node** current_node, Token** tokenArray, int* ip){
     Node* semi = create_node(tokenArray[*ip]->value, tokenArray[*ip]->Type);
     (*current_node)->right = semi;
     (*current_node) = semi;
-    
+    //print_tree(printNode, "print", 0); 
 }
 
 

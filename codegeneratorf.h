@@ -7,6 +7,7 @@
 
 typedef struct calls{
     int number;
+    char* value;
     char* func_call;
     char* var_name;
 }calls;
