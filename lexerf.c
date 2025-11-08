@@ -98,24 +98,31 @@ Token* gen_string(int* current_index, char* current){
     int len = 0;
     int mx_len = 32;
     printf("%c\n", current[*current_index]);
-    while(current[*current_index] != 34 && current[(*current_index)-1] != 92){
+    while(current[*current_index] != 34){
         if(len == mx_len){
             mx_len *= 2;
             string = realloc(string, mx_len);
         }
         
-        string[len++] = current[(*current_index)++];
-        printf("lex107\n");
+        string[len++] = current[(*current_index)];
+
+        if(current[(*current_index)] == '\\'){
+            if(mx_len == len){
+                mx_len *= 2;
+                string = realloc(string, mx_len);
+            }
+            string = realloc(string, mx_len);
+            string[len++] = '\\';
+        }
+        (*current_index)++;
+
     }
     (*current_index)++;
-    printf("lex109: %s\n", string);
     string = realloc(string, len+1);
     string[len] = '\0';
 
     token->value = string;
-    printf("lex:114 -> %s\n", string);
     token->Type = STRING;
-    printf("l118: %c\n", current[*current_index]);
     return token;
 }
 

@@ -30,4 +30,4 @@ cobra : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o _print.o
 
 clean : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o _print.o
 	rm *.o
-	$(RM) -r cobra assembly/genra output* *dSYM
+	$(RM) -r cobra assembly/gencra output* *dSYM

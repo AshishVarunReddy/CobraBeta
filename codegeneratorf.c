@@ -57,6 +57,7 @@ int sysgen(char* call){
         perror("Impossible checkout\n");
     }
     long length;
+    printf("fucks\n");
     fseek(ff, 0, SEEK_END);
     length = ftell(ff);
     fseek(ff, 0, SEEK_SET);
@@ -83,9 +84,42 @@ int sysgen(char* call){
 
 //function that turns complex strings to something that write syscall is capable of printing..
 
-char** string_customizer(int* pieces, char* string){
-        return NULL;
+char** string_tokenizer(int* pieces, char* string){
+    char* n_str = strdup(string);
+    const char* delm = "\\";
+    int mx_size = 8;
+    char** res = (char**)malloc(sizeof(char*)*mx_size);
+    for(char* p = strtok(n_str, delm); n_str && p; p = strtok(n_str, delm)){
+        if(mx_size == (*pieces)){
+            mx_size *= 2;
+            res = realloc(res, mx_size);
+        }
+
+        res[(*pieces)++] = strdup(p); 
+        n_str = n_str + strlen(p) + 2;
+        char* nl = "\n";
+        printf("multimotehrfsks: %c\n", *n_str);
+        if(*n_str == 'n'){
+            if(mx_size == (*pieces)){
+                mx_size *= 2;
+                res = realloc(res, mx_size);
+            }
+            printf("solo mertorfiekers\n");
+            res[(*pieces)++] = strdup(nl);
+            n_str++;
+        }
     }
+    int ie = (*pieces) + 1;
+    res = realloc(res, ie);
+
+    for(int i = 0; i<ie-2; i++){
+        printf("code115%s\n", res[i]);
+    }
+    res[*pieces] = NULL;
+   // (*pieces)--;
+    printf("Hi %d\n", ie);
+    return res;
+}
 
 int num_vars = 0;
 
@@ -228,7 +262,22 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
         fprintf(fp, "syscall\n");
         }else if(c->func_call && !strcmp(c->func_call, "print")){
             printf("222code\n");
-            fprintf(fp, "mov rax, 1\nmov rdi, 1\nmov rsi, m%d\nmov rdx, %zu\nsyscall\n\nsection .data\nm%d db \"%s\", 10\n", sno, strlen(c->value)+1, sno,  c->value);
+            fprintf(fp, "mov rax, 1\nmov rdi, 1\nmov rsi, m%d\nmov rdx, %zu\nsyscall\n\nsection .data\n", sno, strlen(c->value)+1);
+            fprintf(fp, "m%d db ", sno);
+            int piece = 0;
+            char** toks = string_tokenizer(&piece, c->value);
+            for(int i = 0; i<piece-1; i++){
+                printf("H\n");
+                if(*toks[i] == '\n'){
+                    printf("256code: %d\n", *toks[i]);
+                    fprintf(fp, "%d, ", *toks[i]);
+                }else{
+                    printf("259code: %s\n", toks[i]);
+                    fprintf(fp, "\"%s\", ", toks[i]);
+                }
+            }
+            printf("267code: %d\n", piece);
+            fprintf(fp, "0\n\n");
             sno++;
             if(root->right || root->left){
                 fprintf(fp, "section .text\n");
