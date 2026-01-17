@@ -13,3 +13,4 @@ stackf.o
 assembly/gencra
 assembly/gencra.asm
 calls/_print.o
+assembly

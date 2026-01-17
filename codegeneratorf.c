@@ -98,24 +98,20 @@ char** string_tokenizer(int* pieces, char* string){
         res[(*pieces)++] = strdup(p); 
         n_str = n_str + strlen(p) + 2;
         char* nl = "\n";
-        printf("multimotehrfsks: %c\n", *n_str);
+        printf("code101: %c\n", *n_str);
         if(*n_str == 'n'){
             if(mx_size == (*pieces)){
                 mx_size *= 2;
                 res = realloc(res, mx_size);
             }
-            printf("solo mertorfiekers\n");
             res[(*pieces)++] = strdup(nl);
             n_str++;
         }
     }
     int ie = (*pieces) + 1;
-    res = realloc(res, ie);
-
     for(int i = 0; i<ie-2; i++){
         printf("code115%s\n", res[i]);
     }
-    res[*pieces] = NULL;
    // (*pieces)--;
     printf("Hi %d\n", ie);
     return res;
@@ -266,17 +262,17 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
             fprintf(fp, "m%d db ", sno);
             int piece = 0;
             char** toks = string_tokenizer(&piece, c->value);
-            for(int i = 0; i<piece-1; i++){
+            printf("268code %d\n", piece);
+            for(int i = 0; i<piece; i++){
                 printf("H\n");
                 if(*toks[i] == '\n'){
-                    printf("256code: %d\n", *toks[i]);
+                    printf("271code: %d\n", *toks[i]);
                     fprintf(fp, "%d, ", *toks[i]);
                 }else{
-                    printf("259code: %s\n", toks[i]);
+                    printf("274code: %s\n", toks[i]);
                     fprintf(fp, "\"%s\", ", toks[i]);
                 }
             }
-            printf("267code: %d\n", piece);
             fprintf(fp, "0\n\n");
             sno++;
             if(root->right || root->left){
@@ -303,6 +299,12 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
 }
 
 int generate_code(Node* root, item*** variable_s){
+    pid_t pd = fork();
+    if(pd == 0){
+        execlp("mkdir", "mkdir","-p",  "/home/n_ll/mfiles/CobraBeta/assembly", NULL);
+    }else{
+        wait(NULL);
+    }
     FILE* f = fopen("./assembly/gencra.asm", "w");
     if(!f){
         perror("File not opened!!\n");

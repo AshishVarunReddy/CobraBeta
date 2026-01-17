@@ -3,6 +3,13 @@ source=comp.c lexerf.c
 output=comp
 cflags=-Wall --static -g
 
+all : clean comp.o lexerf.o parserf.o codegenerator.o stackf.o hashtable.o _print.o cobra
+
+clean :
+	rm *.o
+	$(RM) -r cobra 
+	rm -rf assembly
+
 comp.o : comp.c lexerf.h
 	$(cc)  -c comp.c
 
@@ -28,6 +35,4 @@ cobra : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o _print.o
 	$(cc) $(cflags) comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o _print.o -o cobra
 
 
-clean : comp.o lexerf.o parserf.o codegeneratorf.o stackf.o hashtable.o _print.o
-	rm *.o
-	$(RM) -r cobra assembly/gencra output* *dSYM
+
