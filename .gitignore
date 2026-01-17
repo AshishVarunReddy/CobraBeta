@@ -3,7 +3,7 @@ lexerf.o
 cobra
 test.cra
 parserf.o
-codegenerator.o
+codegeneratorf.o
 hashtable.o
 assembly/test.asm
 assembly/test.o
@@ -11,3 +11,5 @@ assembly/test
 assembly/Makefile
 stackf.o
 assembly/gencra
+assembly/gencra.asm
+calls/_print.o
