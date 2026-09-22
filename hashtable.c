@@ -9,9 +9,7 @@ item** create_hash(int n){
         itemp->value = NULL;
         itemp->depth = -1;
         itemp->type = NULL;
-        itemp->editIndex = -1;
         itemp->edits = NULL;
-        itemp->totaledits = 0;
         itemp_array[i] = itemp;
     }
 

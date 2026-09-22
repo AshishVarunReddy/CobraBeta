@@ -15,10 +15,14 @@ typedef struct item{
     char* value;
     int depth;
     char* type;
-    int editIndex;
-    int totaledits;
     Node** edits;
 }item;
+
+
+typedef struct env {
+    struct env const * parent;
+    item* local;
+}env;
 
 item** create_hash(int n);
 

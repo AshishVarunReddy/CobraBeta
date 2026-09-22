@@ -3,8 +3,8 @@
 void handle_print(Node** current_node, Token** tokenArray, int* ip){
     Node* init_node = (*current_node);
     if(strcmp(tokenArray[*ip]->value, "print")){
-    printf("error Aborting...\n");
-    exit(1);
+        printf("error Aborting...\n");
+        exit(1);
     }
     Node* printNode = create_node(tokenArray[*ip]->value, tokenArray[*ip]->Type);
     (*current_node)->right = printNode;
@@ -12,8 +12,8 @@ void handle_print(Node** current_node, Token** tokenArray, int* ip){
     (*ip)++;
 
     if(*tokenArray[*ip]->value != '('){
-    fprintf(stderr, "No opening brackets.. Aborting...\n");
-    exit(1);
+        fprintf(stderr, "No opening brackets.. Aborting...\n");
+        exit(1);
     }
     Node* oParen = create_node(tokenArray[*ip]->value, tokenArray[*ip]->Type);
     (*current_node)->left = oParen;
@@ -40,7 +40,7 @@ void handle_print(Node** current_node, Token** tokenArray, int* ip){
         fprintf(stderr, "No semiColon.. Aborting..\n");
         exit(1);
     }
-    
+
     Node* semi = create_node(tokenArray[*ip]->value, tokenArray[*ip]->Type);
     (*current_node)->right = semi;
     (*current_node) = semi;

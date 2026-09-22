@@ -38,7 +38,7 @@ void print_token(Token* token){
         default:
             printf("Undefined type\n");
     }
-    
+
 }
 
 Token* gen_num(int* current_index, char* current){
@@ -103,7 +103,7 @@ Token* gen_string(int* current_index, char* current){
             mx_len *= 2;
             string = realloc(string, mx_len);
         }
-        
+
         string[len++] = current[(*current_index)];
 
         if(current[(*current_index)] == '\\'){
@@ -157,9 +157,9 @@ Token** lexer(FILE* fp){
             tokenArray = (Token**)realloc(tokenArray, (token_index+1)*sizeof(Token*));
         }
         if(isdigit(current[current_index])){
-           Token* test_tok = gen_num(&current_index, current);
-           tokenArray[token_index++] = test_tok;
-           current_index--;
+            Token* test_tok = gen_num(&current_index, current);
+            tokenArray[token_index++] = test_tok;
+            current_index--;
         }else if(isalpha(current[current_index])){
             Token* key = gen_key_or_ident(&current_index, current);
             tokenArray[token_index++] = key;
@@ -212,7 +212,7 @@ Token** lexer(FILE* fp){
 
         current_index++;
     }
-    
+
     if(token_index+1 > 12){
         tokenArray = (Token**)realloc(tokenArray, (token_index+1)*sizeof(Token*));
     }

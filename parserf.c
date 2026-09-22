@@ -35,10 +35,10 @@ void print_tree(Node* root, char* prestatement, int spaces){
         printf("   ");
     }
     printf("%s: %s\n",prestatement, root->value);
-   if(root->left)
-      print_tree(root->left, "left", spaces+1);
-   if(root->right)
-      print_tree(root->right, "right", spaces+1);
+    if(root->left)
+        print_tree(root->left, "left", spaces+1);
+    if(root->right)
+        print_tree(root->right, "right", spaces+1);
 }
 
 int op_prec(char s){
@@ -62,29 +62,29 @@ char** exp_convertor(char** expr, int iter, int* mov){
     prefix[iter] = NULL;
     stack* st = create_stack_element("STACK_END");
     for(int i = iter-1; i>=0; i--){
-       
-       if(isalnum(*expr[i]) || atoi(expr[i]) < 0){
+
+        if(isalnum(*expr[i]) || atoi(expr[i]) < 0){
             prefix[z] = expr[i];
             z--;
-       }else if(*expr[i] == ')'){
+        }else if(*expr[i] == ')'){
             push(&st, expr[i]);
-       }else if(*expr[i] == '('){
-           while(empty_stack(st) == 0 && strcmp(peep(st), ")")){
-               prefix[z] = peep(st);
-               z--;
-               popStack(&st);
-           }
-           popStack(&st);
-       }else{
-           while(empty_stack(st) == 0 && op_prec(*expr[i]) < op_prec(*peep(st))){//CHECK FOR EQUALITY!!
-               prefix[z] = peep(st);
-               z--;
-               popStack(&st);
-           }
-           push(&st, expr[i]);
+        }else if(*expr[i] == '('){
+            while(empty_stack(st) == 0 && strcmp(peep(st), ")")){
+                prefix[z] = peep(st);
+                z--;
+                popStack(&st);
+            }
+            popStack(&st);
+        }else{
+            while(empty_stack(st) == 0 && op_prec(*expr[i]) < op_prec(*peep(st))){//CHECK FOR EQUALITY!!
+                prefix[z] = peep(st);
+                z--;
+                popStack(&st);
+            }
+            push(&st, expr[i]);
 
-       }
-       
+        }
+
     }
     while(strcmp(peep(st), "STACK_END")){
         prefix[z] = peep(st);
@@ -102,164 +102,164 @@ char** exp_convertor(char** expr, int iter, int* mov){
 static int x = 0;
 
 Node* generate_operation_tree(char** expression_array, int lt){
-       if(lt <= x)return NULL;
-       char* sl = expression_array[x];
-       Node* node = create_node(expression_array[x], (isalnum(*(sl)) || atoi(sl)<0) ? (isalpha(*(sl))) ? IDENTIFIER: INT : OPERATOR);
-        
-       x++;
-       
-       if(node->type == INT || node->type == IDENTIFIER){
-           return node;
-       }
-       node->left = generate_operation_tree(expression_array,  lt);
+    if(lt <= x)return NULL;
+    char* sl = expression_array[x];
+    Node* node = create_node(expression_array[x], (isalnum(*(sl)) || atoi(sl)<0) ? (isalpha(*(sl))) ? IDENTIFIER: INT : OPERATOR);
 
-       node->right = generate_operation_tree(expression_array,  lt);
-       return node;
+    x++;
+
+    if(node->type == INT || node->type == IDENTIFIER){
+        return node;
+    }
+    node->left = generate_operation_tree(expression_array,  lt);
+
+    node->right = generate_operation_tree(expression_array,  lt);
+    return node;
 }
 
 char** expression_string_generator(Token** tokenArray, Node* current_node, int* ip, int inParen){
     char** expr = (char**)malloc((token_index+1)*sizeof(char*));
     expr[token_index] = NULL;
     Token* current_token = tokenArray[*ip];
-     stack* st = create_stack_element("STACK_END");
-     if(inParen == 1){
+    stack* st = create_stack_element("STACK_END");
+    if(inParen == 1){
         push(&st, "(");
-     }else{
-         push(&st, "BUFFERS");
-     }
+    }else{
+        push(&st, "BUFFERS");
+    }
     if(!strcmp(current_token->value, "(") || current_token->Type == INT || *current_token->value == '-' || current_token->Type == IDENTIFIER){
         if(current_token->Type == INT && *tokenArray[*ip + 1]->value == ';'){
-        Node* expr_node = create_node(current_token->value, current_token->Type);
-        current_node->left = expr_node;
-        expr[0] = current_token->value;
-        return expr;
+            Node* expr_node = create_node(current_token->value, current_token->Type);
+            current_node->left = expr_node;
+            expr[0] = current_token->value;
+            return expr;
         }
-          int j = *ip;
-          int iter = 0;
-          while(empty_stack(st) == 0 && tokenArray[j]->Type != EOFILE){
-              if(tokenArray[j]->Type == KEYWORD){
-        int* s = NULL;
-        perror("KEYWORD occured before semicolon\n");
-        exit(1);
-      }
-              if(*tokenArray[j]->value == ';' && inParen == 0){
-                  popStack(&st);
-              }
+        int j = *ip;
+        int iter = 0;
+        while(empty_stack(st) == 0 && tokenArray[j]->Type != EOFILE){
+            if(tokenArray[j]->Type == KEYWORD){
+                int* s = NULL;
+                perror("KEYWORD occured before semicolon\n");
+                exit(1);
+            }
+            if(*tokenArray[j]->value == ';' && inParen == 0){
+                popStack(&st);
+            }
             if(inParen == 1){
-              if(strcmp(tokenArray[j] -> value, ")")){
-                   push(&st, tokenArray[j]->value);
-              }else{
-                  while(strcmp(peep(st), "(")){
-                       popStack(&st);
-                  }
-                   popStack(&st);
-              }
+                if(strcmp(tokenArray[j] -> value, ")")){
+                    push(&st, tokenArray[j]->value);
+                }else{
+                    while(strcmp(peep(st), "(")){
+                        popStack(&st);
+                    }
+                    popStack(&st);
+                }
             }
             if(empty_stack(st) == 0){
-              if(iter == 0 && (*tokenArray[j]->value == '-')){
-                  expr[iter++] = "0";
-                  }else if((tokenArray[j-1]->Type == OPERATOR && *tokenArray[j-1]->value != '=') && *tokenArray[j]->value == '-'){
-                      if(tokenArray[j+1]->Type == INT){
-                          int ln = strlen(tokenArray[j+1]->value);
-                          char* bf = (char*)malloc(sizeof(char*)*(ln+2));
-                          bf[ln+1] = '\0';
-                          sprintf(bf, "-%s", tokenArray[j+1]->value);
-                          tokenArray[j]->value = bf;
-                          tokenArray[j]->Type = INT;
-                          printf("BOSON\n");
-                          j+=2;
-                          expr[iter] = bf;
-                          iter++;
-                          continue;
-                      }else if(*tokenArray[j+1]->value == '('){
-                          stack* substack = create_stack_element("STACK_END");
-                          push(&substack, "BUFFER");
-                          int k = j;
-                          k++;
-                          push(&st, tokenArray[k]->value);
-                          expr[iter++] = tokenArray[k++]->value;
-                          push(&st, "0");
-                          expr[iter++] = "0";
-                          push(&st, "-");
-                          expr[iter++] = "-";
-                          j+=2;
-                          k = j;
-                          while(empty_stack(substack) == 0){
+                if(iter == 0 && (*tokenArray[j]->value == '-')){
+                    expr[iter++] = "0";
+                }else if((tokenArray[j-1]->Type == OPERATOR && *tokenArray[j-1]->value != '=') && *tokenArray[j]->value == '-'){
+                    if(tokenArray[j+1]->Type == INT){
+                        int ln = strlen(tokenArray[j+1]->value);
+                        char* bf = (char*)malloc(sizeof(char*)*(ln+2));
+                        bf[ln+1] = '\0';
+                        sprintf(bf, "-%s", tokenArray[j+1]->value);
+                        tokenArray[j]->value = bf;
+                        tokenArray[j]->Type = INT;
+                        printf("BOSON\n");
+                        j+=2;
+                        expr[iter] = bf;
+                        iter++;
+                        continue;
+                    }else if(*tokenArray[j+1]->value == '('){
+                        stack* substack = create_stack_element("STACK_END");
+                        push(&substack, "BUFFER");
+                        int k = j;
+                        k++;
+                        push(&st, tokenArray[k]->value);
+                        expr[iter++] = tokenArray[k++]->value;
+                        push(&st, "0");
+                        expr[iter++] = "0";
+                        push(&st, "-");
+                        expr[iter++] = "-";
+                        j+=2;
+                        k = j;
+                        while(empty_stack(substack) == 0){
                             char* substr = tokenArray[k]->value;
                             if(*substr == '('){
-                              push(&substack, "(");
+                                push(&substack, "(");
                             }else if(*substr == ')'){
                                 while(*peep(substack) != '(' && strcmp(peep(substack), "BUFFER")){
-                                      popStack(&substack);
-                                  }
+                                    popStack(&substack);
+                                }
                                 popStack(&substack);
                             }else if((*substr == '+' || *substr == '-') && !strcmp(peep(substack), "BUFFER")){
                                 if(*substr == '+'){
-                                      *substr = '-';
-                                  }else{
-                                      if(*tokenArray[k-1]->value == '/' || *tokenArray[k-1]->value == '*')
-                                          *substr = '-';
-                                      else
-                                          *substr = '+';
-                                  }
-                              }
-                              k++;
-                          }
-                      }
-                  }
-            if(*tokenArray[j]->value != ' ' && tokenArray[j]->Type != KEYWORD){
-                expr[iter++] = tokenArray[j]->value;
-            }
-            j++;
+                                    *substr = '-';
+                                }else{
+                                    if(*tokenArray[k-1]->value == '/' || *tokenArray[k-1]->value == '*')
+                                        *substr = '-';
+                                    else
+                                        *substr = '+';
+                                }
+                            }
+                            k++;
+                        }
+                    }
+                }
+                if(*tokenArray[j]->value != ' ' && tokenArray[j]->Type != KEYWORD){
+                    expr[iter++] = tokenArray[j]->value;
+                }
+                j++;
             }
         }
-            printf("\npars209: ");
-            for(int p = 0; p<iter; p++){
-                printf("%s /",expr[p]);
-            }
-            printf("\n");
-            //printf("black hole:%s\n", exp_convertor(expr, iter));
-            int mov = 0;
-            char** expression_array = exp_convertor(expr, iter, &mov);
-            //memmove(expression_array, expression_array+mov, ;
-            for(int y = 0; y<iter-mov; y++){
-                expression_array[y] = expression_array[y+mov];
-                printf("%s ", expression_array[y]);
-            }
-            expression_array[iter-mov] = NULL;
-            printf("\n");
-            Node* synode = generate_operation_tree(expression_array, iter-mov);
-            x = 0;
-            print_tree(synode, "center", 0);
-            current_node->left = synode;
-            current_token = tokenArray[j];
-            *ip = j;
-            printf("black Hole: %s\n", current_token->value);
-        
-        }else{
-            print_token(current_token);
-            perror("Syntax Error at int or anthing else\n");
-            exit(2);
+        printf("\npars209: ");
+        for(int p = 0; p<iter; p++){
+            printf("%s /",expr[p]);
         }
+        printf("\n");
+        //printf("black hole:%s\n", exp_convertor(expr, iter));
+        int mov = 0;
+        char** expression_array = exp_convertor(expr, iter, &mov);
+        //memmove(expression_array, expression_array+mov, ;
+        for(int y = 0; y<iter-mov; y++){
+            expression_array[y] = expression_array[y+mov];
+            printf("%s ", expression_array[y]);
+        }
+        expression_array[iter-mov] = NULL;
+        printf("\n");
+        Node* synode = generate_operation_tree(expression_array, iter-mov);
+        x = 0;
+        print_tree(synode, "center", 0);
+        current_node->left = synode;
+        current_token = tokenArray[j];
+        *ip = j;
+        printf("black Hole: %s\n", current_token->value);
+
+    }else{
+        print_token(current_token);
+        perror("Syntax Error at int or anthing else\n");
+        exit(2);
+    }
     return expr;
 
 }
 void printtok(const char* s, Token* token){
-  printf("%s", s);
-  print_token(token);
+    printf("%s", s);
+    print_token(token);
 }
 int handle_exit_syscall(Token** tokenArray, Node* current_node, int i, item** variable_table){
-        if(i > 0 && *tokenArray[i-1]->value != ';'){
-    perror("Function call must be first token or preceded by semicolon\n");
-    exit(1);
-  }
-        Token* current_token = tokenArray[i];
-        Node* exitNode = create_node(current_token->value, KEYWORD);
-        current_node->right = exitNode;
-        current_node = current_node->right;
-        current_token = tokenArray[++i];
-       // expression_string_generator(tokenArray, current_node, &i, 1);       
-        if(!strcmp(current_token->value, "(") && current_token->Type == SEPARATOR){
+    if(i > 0 && *tokenArray[i-1]->value != ';'){
+        perror("Function call must be first token or preceded by semicolon\n");
+        exit(1);
+    }
+    Token* current_token = tokenArray[i];
+    Node* exitNode = create_node(current_token->value, KEYWORD);
+    current_node->right = exitNode;
+    current_node = current_node->right;
+    current_token = tokenArray[++i];
+    // expression_string_generator(tokenArray, current_node, &i, 1);       
+    if(!strcmp(current_token->value, "(") && current_token->Type == SEPARATOR){
         Node* oParen = create_node(current_token->value, SEPARATOR);
         current_node->left = oParen;
         current_node = oParen;
@@ -274,7 +274,7 @@ int handle_exit_syscall(Token** tokenArray, Node* current_node, int i, item** va
         else if(tokenArray[i]->Type == INT){
             expression_string_generator(tokenArray, current_node, &i, 1);
             current_token = tokenArray[i];
-            
+
         }else if(tokenArray[i]->Type == IDENTIFIER){
             print_token(current_token);
             if(search_var(variable_table, var_num, current_token->value)){
@@ -306,7 +306,7 @@ int handle_exit_syscall(Token** tokenArray, Node* current_node, int i, item** va
             exit(1);
         }
 
- 
+
     }
     return i;
 }
@@ -336,10 +336,10 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
     }
     if(tokenArray[i]->Type == OPERATOR){
         if(!strcmp(tokenArray[i]->value, "=")){
-           Node* eqNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
-           (*current_node)->left = eqNode;
-           *current_node = eqNode;
-           i++;
+            Node* eqNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
+            (*current_node)->left = eqNode;
+            *current_node = eqNode;
+            i++;
         }else{
             perror("Expected '=' but got something else\n");
             exit(1);
@@ -356,8 +356,8 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
         i++;
     }else
         expression_string_generator(tokenArray, *current_node, &i, 0); 
-    
-    
+
+
     if(tokenArray[i]->Type == SEPARATOR){
         if(*tokenArray[i]->value == ';'){
             Node* semi_node = create_node(tokenArray[i]->value, tokenArray[i]->Type);
@@ -370,51 +370,51 @@ int create_variable(Token** tokenArray, Node**current_node, int i, item** variab
                 *current_node = initial;
             }
         }else{
-      perror("No semicolon at the end\n");
-      exit(1);
-    }
+            perror("No semicolon at the end\n");
+            exit(1);
+        }
     }
     return i;
 }
 
 void edit_variable(item* variable, Token** tokenArray, int* ip, Node** current_node){
-      Node* init_node = *current_node;
-      int i = *ip;
-      Node* editVar = create_node(tokenArray[i]->value, tokenArray[i]->Type);
-      (*current_node)->left = editVar;
-      (*current_node) = (*current_node)->left;
-      Node* stopNode = (*current_node);
-      
-      i++;
-      if(*tokenArray[i]->value != '='){
-          printf("Found no assignment sign. Aborting the compilation...\n");
-          exit(1);
-      }
-      Node* eqNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
-      (*current_node)->left = eqNode;
-      (*current_node) = (*current_node)->left; 
-      *ip = ++i;
-      if(tokenArray[i]->Type == INT && *tokenArray[i+1]->value == ';'){
-          Node* numNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
-          (*current_node)->left = numNode;
-          (*ip)++;
-      }else{
-         expression_string_generator(tokenArray, *current_node, ip, 0);
-      }
-      (*current_node) = stopNode; //slightly different from creating variable. We move back to the identifier instead of data_type keyword.
-      i = *ip;
-      if(*tokenArray[i]->value != ';'){
-          printf("No semicolon at the end of the statment. Aborting...\n");
-          exit(1);
-      }
-      Node* semiNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
-      (*current_node)->right = semiNode;
-      if((tokenArray[i+1] && tokenArray[i+1]->Type == IDENTIFIER) ||(tokenArray[i+2] && tokenArray[i+2]->Type == IDENTIFIER)){
-          *current_node = semiNode;
-      }else{
-          *current_node = init_node;
-      }
-      print_tree(init_node, "edit", 0);
+    Node* init_node = *current_node;
+    int i = *ip;
+    Node* editVar = create_node(tokenArray[i]->value, tokenArray[i]->Type);
+    (*current_node)->left = editVar;
+    (*current_node) = (*current_node)->left;
+    Node* stopNode = (*current_node);
+
+    i++;
+    if(*tokenArray[i]->value != '='){
+        printf("Found no assignment sign. Aborting the compilation...\n");
+        exit(1);
+    }
+    Node* eqNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
+    (*current_node)->left = eqNode;
+    (*current_node) = (*current_node)->left; 
+    *ip = ++i;
+    if(tokenArray[i]->Type == INT && *tokenArray[i+1]->value == ';'){
+        Node* numNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
+        (*current_node)->left = numNode;
+        (*ip)++;
+    }else{
+        expression_string_generator(tokenArray, *current_node, ip, 0);
+    }
+    (*current_node) = stopNode; //slightly different from creating variable. We move back to the identifier instead of data_type keyword.
+    i = *ip;
+    if(*tokenArray[i]->value != ';'){
+        printf("No semicolon at the end of the statment. Aborting...\n");
+        exit(1);
+    }
+    Node* semiNode = create_node(tokenArray[i]->value, tokenArray[i]->Type);
+    (*current_node)->right = semiNode;
+    if((tokenArray[i+1] && tokenArray[i+1]->Type == IDENTIFIER) ||(tokenArray[i+2] && tokenArray[i+2]->Type == IDENTIFIER)){
+        *current_node = semiNode;
+    }else{
+        *current_node = init_node;
+    }
+    print_tree(init_node, "edit", 0);
 }
 
 item** symbol_returner(item** itemizer){
@@ -438,7 +438,7 @@ Node* parser(Token** tokenArray, item*** variable_s){
         if(current_node == NULL){
             exit(-1);
         }
-     
+
         current_token = tokenArray[i];
         switch(current_token->Type){
             case KEYWORD:
@@ -464,17 +464,17 @@ Node* parser(Token** tokenArray, item*** variable_s){
                 break;
             case IDENTIFIER:
                 if(i > 0 && *tokenArray[i-1]->value == ';'){
-                  item* found_item;
-                  printf("454pars->%d\n", var_num);
-                  if((found_item = search_var(variable_table, var_tracer, current_token->value))){
+                    item* found_item;
+                    printf("454pars->%d\n", var_num);
+                    if((found_item = search_var(variable_table, var_tracer, current_token->value))){
                         printf("478pars: UndeclaredKing\n");
                         edit_variable(found_item, tokenArray, &i, &current_node);
                         printf("490pars: %s\n", current_node->value);
                         print_tree(current_node, "totalTreeAfterediting", 0);
-                  }else{
+                    }else{
                         printf("Cannot edit undeclared variables. Aborting...\n");
                         exit(1);
-                  }
+                    }
                 }else{
                     printf("A program starting with editing variables, or missing a semicolon. Rookie Mistakes. Aborting...\n");
                     exit(1);

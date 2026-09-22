@@ -44,7 +44,7 @@ int operations_asm(int a, int b, char op, FILE* fp){
         fprintf(fp, "mov rax, %d\nmov r10, %d\nidiv r10\nmov rax, rdx\n",a , b);
         return a%b;
     }
-    
+
     exit(-1);
 }
 
@@ -68,15 +68,15 @@ int sysgen(char* call){
     char* current = strdup(buf);
     char* rem_str = current;
     for(char* p = strtok(current, ";"); p; p = strtok(rem_str, ";")){
-            char* p2 = strdup(p);
-            char* s = strtok(p2, " ");
-            if(!strcmp(s, call)){
-                result = atoi(p2+strlen(s)+1);
-                break;
-            }
-            i++;
-            rem_str = rem_str+strlen(p)+1;
-            free(p2);
+        char* p2 = strdup(p);
+        char* s = strtok(p2, " ");
+        if(!strcmp(s, call)){
+            result = atoi(p2+strlen(s)+1);
+            break;
+        }
+        i++;
+        rem_str = rem_str+strlen(p)+1;
+        free(p2);
     }
     fclose(ff);
     return result;
@@ -112,7 +112,7 @@ char** string_tokenizer(int* pieces, char* string){
     for(int i = 0; i<ie-2; i++){
         printf("code115%s\n", res[i]);
     }
-   // (*pieces)--;
+    // (*pieces)--;
     printf("Hi %d\n", ie);
     return res;
 }
@@ -120,7 +120,7 @@ char** string_tokenizer(int* pieces, char* string){
 int num_vars = 0;
 
 int calculate_node(Node** op_node, FILE* fp, item** variable_s){
-    
+
     if(!(*op_node)){
         perror("error op tree\n");
         exit(-1);
@@ -139,29 +139,29 @@ int calculate_node(Node** op_node, FILE* fp, item** variable_s){
 
     if(((*op_node)->left->type == INT || (*op_node)->left->type == IDENTIFIER) && ((*op_node)->right->type == INT || (*op_node)->right->type == IDENTIFIER)){
         if((*op_node)->left->type == IDENTIFIER){
-      item* changers = search_var(variable_s, var_num, (*op_node)->left->value);
-      if(changers->value == NULL){
-        perror("Variable not initialized\n");
-        exit(1);
-      }else{
-        (*op_node)->left->value = changers->value;
-        (*op_node)->left->type = INT;
-        printf("code114:%s\n", changers->value);
-      }
-    }
+            item* changers = search_var(variable_s, var_num, (*op_node)->left->value);
+            if(changers->value == NULL){
+                perror("Variable not initialized\n");
+                exit(1);
+            }else{
+                (*op_node)->left->value = changers->value;
+                (*op_node)->left->type = INT;
+                printf("code114:%s\n", changers->value);
+            }
+        }
 
-       if((*op_node)->right->type == IDENTIFIER){
-      printf("Hello right motherfukcers\n");
+        if((*op_node)->right->type == IDENTIFIER){
+            printf("Hello right motherfukcers\n");
             item* changers = search_var(variable_s, var_num, (*op_node)->right->value);
             if(changers->value == NULL){
-              perror("Variable not initialized\n");
-              exit(1);
+                perror("Variable not initialized\n");
+                exit(1);
             }else{
-              (*op_node)->right->value = changers->value;
-              (*op_node)->right->type = INT;
-              printf("code126: %s\n", changers->value);
+                (*op_node)->right->value = changers->value;
+                (*op_node)->right->type = INT;
+                printf("code126: %s\n", changers->value);
             }
-          }
+        }
 
         int a = atoi((*op_node)->left->value);
         int b = atoi((*op_node)->right->value);
@@ -178,7 +178,7 @@ int calculate_node(Node** op_node, FILE* fp, item** variable_s){
 
         (*op_node)->type = INT;
     }
-   return atoi((*op_node)->value);
+    return atoi((*op_node)->value);
 }
 int16_t nbuf = 1;
 int str_num = 0;
@@ -209,8 +209,8 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
     if(root->type == IDENTIFIER){
         item* i;
         if(root->left && *(root->left->value) == '='){
-          c->var_name = root->value;
-          c->func_call = NULL;
+            c->var_name = root->value;
+            c->func_call = NULL;
         }
         if((i = search_var(variable_s, num_vars, root->value))){
             fprintf(fp, "mov r10, [rbp - %d]\n", i->depth);
@@ -226,10 +226,10 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
     if((t == INT || t == OPERATOR) && *root->value != '='){
         int num;
         if(t == OPERATOR)
-             num = calculate_node(&root, fp, variable_s);
+            num = calculate_node(&root, fp, variable_s);
         else num = atoi(root->value);
-       // if(t == INT){
-            fprintf(fp, "mov rax, %s\n", root->value);
+        // if(t == INT){
+        fprintf(fp, "mov rax, %s\n", root->value);
         //}
 
         free(root->right);
@@ -253,9 +253,9 @@ void traverse(Node* root, FILE* fp, calls* c, item** variable_s){
     if((c->func_call || c->var_name) && !strcmp(root->value, ";")){
         printf("; appeared 211 code\n");
         if(c->func_call && !strcmp(c->func_call, "exit")){
-        printf("213code\n");
-        fprintf(fp, "%s:\nmov rax, %d\nmov rdi, r10\n", c->func_call, c->number);
-        fprintf(fp, "syscall\n");
+            printf("213code\n");
+            fprintf(fp, "%s:\nmov rax, %d\nmov rdi, r10\n", c->func_call, c->number);
+            fprintf(fp, "syscall\n");
         }else if(c->func_call && !strcmp(c->func_call, "print")){
             printf("222code\n");
             fprintf(fp, "mov rax, 1\nmov rdi, 1\nmov rsi, m%d\nmov rdx, %zu\nsyscall\n\nsection .data\n", sno, strlen(c->value)+1);
@@ -311,14 +311,14 @@ int generate_code(Node* root, item*** variable_s){
         exit(1);
     }
     printf("240code\n");
-   
+
     calls* c = (calls*)malloc(sizeof(calls));
     c->func_call = NULL;
     c->var_name = NULL;
     c->number = INT_MIN;
     int syscode;
     if(root->right){
-    syscode = sysgen(root->right->value);
+        syscode = sysgen(root->right->value);
     }
     fprintf(f, "global _start\n");
     fprintf(f, "section .text\n_start:\n");
@@ -327,12 +327,12 @@ int generate_code(Node* root, item*** variable_s){
     }
     traverse(root, f, c, *variable_s);
     fclose(f);
-    
+
     for(int i = 0; i<var_num; i++){
         printf("259code: %s -> %s -> %d\n", (*variable_s)[i]->key, (*variable_s)[i]->value, (*variable_s)[i]->depth);
     }
-    
-    
+
+
     pid_t id = fork();
     if(id == 0){
         execlp("nasm", "nasm", "-f", "elf64", "./assembly/gencra.asm", "-o", "./assembly/gencra.o", NULL);

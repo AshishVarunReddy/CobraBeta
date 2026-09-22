@@ -11,15 +11,15 @@ stack* create_stack_element(char* value){
     stack* newSt = (stack*)malloc(sizeof(stack));
     newSt->value = value;
     //printf("cluser: %s", newSt->value);
-newSt->next = NULL;
+    newSt->next = NULL;
     return newSt;
 }
 
 void push(stack** top, char* value){
-       stack* newStack = (stack*)malloc(sizeof(stack));
-       newStack->value = value;
-       newStack->next = (*top);
-       (*top) = newStack;
+    stack* newStack = (stack*)malloc(sizeof(stack));
+    newStack->value = value;
+    newStack->next = (*top);
+    (*top) = newStack;
 }
 
 int popStack(stack** top){
